@@ -1,17 +1,19 @@
 package com.tuacy.study.nio;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @name: ChannelTest
@@ -71,19 +73,21 @@ public class ChannelTest {
 
     }
 
+    /**
+     * UDP 服务端
+     */
     @Test
-    public void datagramChannelServiceTest() {
+    public void datagramChannelService() {
         try {
             // 获取通道
             DatagramChannel datagramChannel = DatagramChannel.open();
-            // 绑定端口,作为UDP服务端
+            // 绑定端口8989,作为UDP服务端
             datagramChannel.bind(new InetSocketAddress(8989));
             // 分配Buffer,用于收发数据
             ByteBuffer buffer = ByteBuffer.allocate(1024);
             while (true) {
-                // 清空Buffer
                 buffer.clear();
-                // 接受客户端发送数据
+                // 等待接受客户端发送数据
                 SocketAddress socketAddress = datagramChannel.receive(buffer);
                 if (socketAddress != null) {
                     buffer.flip();
@@ -92,83 +96,114 @@ public class ChannelTest {
                     while (buffer.hasRemaining()) {
                         b[bufferReceiveIndex++] = buffer.get();
                     }
-                    System.out.println("receive remote " + socketAddress.toString() + ":" + new String(b, StandardCharsets.UTF_8));
-                    //接收到消息后给发送方回应
+                    System.out.println("收到客户端消息 " + socketAddress.toString() + ":" + new String(b, StandardCharsets.UTF_8));
+                    // 接收到消息后给发送方回应
                     sendDataBack(socketAddress, datagramChannel);
                 }
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            // ignore
         }
     }
 
-
-    public static void main(String[] args) throws IOException {
-        try {
-            final DatagramChannel channel = DatagramChannel.open();
-            //接收消息线程
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    ByteBuffer buffer = ByteBuffer.allocate(1024);
-                    byte b[];
-                    while(true) {
-                        buffer.clear();
-                        SocketAddress socketAddress = null;
-                        try {
-                            socketAddress = channel.receive(buffer);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        if (socketAddress != null) {
-                            int position = buffer.position();
-                            b = new byte[position];
-                            buffer.flip();
-                            for(int i=0; i<position; ++i) {
-                                b[i] = buffer.get();
-                            }
-                            System.out.println("receive remote " +  socketAddress.toString() + ":"  + new String(b, StandardCharsets.UTF_8));
-                        }
-                    }
-                }
-            }).start();;
-
-            //发送控制台输入消息
-            while (true) {
-                Scanner sc = new Scanner(System.in);
-                String next = sc.next();
-                try {
-                    sendMessage(channel, next);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
+    /**
+     * 给socketAddress地址发送消息
+     */
     private void sendDataBack(SocketAddress socketAddress, DatagramChannel datagramChannel) throws IOException {
-        String message = "你好";
+        String message = "send back";
         ByteBuffer buffer = ByteBuffer.allocate(1024);
         buffer.put(message.getBytes(StandardCharsets.UTF_8));
         buffer.flip();
         datagramChannel.send(buffer, socketAddress);
     }
 
-    public static void sendMessage(DatagramChannel channel, String mes) throws IOException {
+    /**
+     * UDP connect() 在特定的地址上收发消息
+     */
+    @Test
+    public void datagramChannelConnect() {
+        try {
+            // 获取通道
+            DatagramChannel datagramChannel = DatagramChannel.open();
+            // 连接到特定的地址，time-a.nist.gov 获取时间。只在这个地址间收发消息 write,read 方法
+            datagramChannel.connect(new InetSocketAddress("time-a.nist.gov", 37));
+            ByteBuffer buffer = ByteBuffer.allocate(8);
+            buffer.order(ByteOrder.BIG_ENDIAN);
+            buffer.put((byte) 0);
+            buffer.flip();
+            // 发送数据到 time-a.nist.gov
+            datagramChannel.write(buffer);
+            buffer.clear();
+            // 前四个字节补0
+            buffer.putInt(0);
+            // 从 time-a.nist.gov 读取数据
+            datagramChannel.read(buffer);
+            buffer.flip();
+            // convert seconds since 1900 to a java.util.Date
+            long secondsSince1900 = buffer.getLong();
+            long differenceBetweenEpochs = 2208988800L;
+            long secondsSince1970 = secondsSince1900 - differenceBetweenEpochs;
+            long msSince1970 = secondsSince1970 * 1000;
+            Date time = new Date(msSince1970);
+            // 打印时间
+            System.out.println(time);
+        } catch (Exception e) {
+            // ignore
+        }
+    }
+
+    // UDP客户端
+    @Test
+    public void datagramChannelClient() {
+        try {
+            final DatagramChannel channel = DatagramChannel.open();
+            // 开一个线程一直接收UDP服务端发送过来的消息
+            new Thread(() -> {
+                try {
+                    ByteBuffer buffer = ByteBuffer.allocate(1024);
+                    while (true) {
+                        buffer.clear();
+                        SocketAddress socketAddress = channel.receive(buffer);
+                        if (socketAddress != null) {
+                            buffer.flip();
+                            byte[] b = new byte[buffer.limit()];
+                            int bufferReceiveIndex = 0;
+                            while (buffer.hasRemaining()) {
+                                b[bufferReceiveIndex++] = buffer.get();
+                            }
+                            System.out.println("收到消息 " + socketAddress.toString() + ":" + new String(b, StandardCharsets.UTF_8));
+                        }
+                    }
+                } catch (Exception e) {
+                    // ignore
+                }
+
+            }).start();
+
+            int messageIndex = 0;
+            // 控制台输入数据，然后发送给指定的地址
+            while (true) {
+                // 5S发送一次数据
+                Uninterruptibles.sleepUninterruptibly(5, TimeUnit.SECONDS);
+                sendMessage(channel, new InetSocketAddress("192.168.5.14", 8989), String.valueOf(messageIndex++));
+            }
+
+        } catch (IOException e) {
+            // ignore
+        }
+    }
+
+
+    private void sendMessage(DatagramChannel channel, InetSocketAddress address, String mes) throws IOException {
         if (mes == null || mes.isEmpty()) {
             return;
         }
         ByteBuffer buffer = ByteBuffer.allocate(1024);
         buffer.clear();
-        buffer.put(mes.getBytes("UTF-8"));
+        buffer.put(mes.getBytes(StandardCharsets.UTF_8));
         buffer.flip();
-        System.out.println("send msg:" + mes);
-        int send = channel.send(buffer, new InetSocketAddress("localhost",8989));
+        channel.send(buffer, address);
     }
 
 }
