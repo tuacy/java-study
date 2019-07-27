@@ -7,10 +7,13 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.FileChannel;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -204,6 +207,79 @@ public class ChannelTest {
         buffer.put(mes.getBytes(StandardCharsets.UTF_8));
         buffer.flip();
         channel.send(buffer, address);
+    }
+
+
+    /**
+     * TCP客户端,阻塞模式
+     */
+    @Test
+    public void socketChannelClient() {
+        try {
+            SocketChannel channel = SocketChannel.open();
+            // 这里使用的是阻塞模式
+            channel.connect(new InetSocketAddress("192.168.5.14", 6800));
+            // KEEP ALIVE setOption()函数的使用,一定要在连接成功之后设置
+            channel.setOption(StandardSocketOptions.SO_KEEPALIVE, true);
+            ByteBuffer buffer = ByteBuffer.allocate(1024);
+            while (true) {
+                buffer.clear();
+                int readLength = channel.read(buffer);
+                if (readLength >= 0) {
+                    buffer.flip();
+                    byte[] b = new byte[buffer.limit()];
+                    int bufferReceiveIndex = 0;
+                    while (buffer.hasRemaining()) {
+                        b[bufferReceiveIndex++] = buffer.get();
+                    }
+                    System.out.println("收到消息 " + ":" + new String(b, StandardCharsets.UTF_8));
+                    // 把收到的消息又发送回去
+                    buffer.clear();
+                    buffer.put(b);
+                    buffer.flip();
+                    channel.write(buffer);
+                }
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * TCP服务端 -- 阻塞模式
+     */
+    @Test
+    public void socketChannelServer() {
+        try {
+            ServerSocketChannel channel = ServerSocketChannel.open();
+            channel.bind(new InetSocketAddress("192.168.5.14", 6800));
+            while (true) {
+                // 接收客户端的连接,之后拿到的就是SocketChannel了，之后都是基于SocketChannel做相应的操作
+                SocketChannel clientSocketChannel = channel.accept();
+                clientSocketChannel.setOption(StandardSocketOptions.SO_KEEPALIVE, true);
+                ByteBuffer buffer = ByteBuffer.allocate(1024);
+                buffer.clear();
+                buffer.put("hello".getBytes(StandardCharsets.UTF_8));
+                buffer.flip();
+                // 给客户端发送消息
+                clientSocketChannel.write(buffer);
+                // 在收下客户端的消息
+                buffer.clear();
+                int readLength = clientSocketChannel.read(buffer);
+                if (readLength >= 0) {
+                    buffer.flip();
+                    byte[] b = new byte[buffer.limit()];
+                    int bufferReceiveIndex = 0;
+                    while (buffer.hasRemaining()) {
+                        b[bufferReceiveIndex++] = buffer.get();
+                    }
+                    System.out.println("收到消息 " + ":" + new String(b, StandardCharsets.UTF_8));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
