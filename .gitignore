@@ -5,3 +5,7 @@ java-study.iml
 # nio module
 nio/nio.iml
 nio/target
+
+# lock module
+lock/lock.iml
+lock/target
