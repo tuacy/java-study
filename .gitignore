@@ -9,3 +9,6 @@ nio/target
 # lock module
 lock/lock.iml
 lock/target
+
+# distributedlock
+distributedlock/distributedlock.iml
