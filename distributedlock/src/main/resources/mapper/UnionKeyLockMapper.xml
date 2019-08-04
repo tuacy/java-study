@@ -1,5 +1,45 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.tuacy.study.distributelock.mapper.UnionKeyLockMapper" >
+<mapper namespace="com.tuacy.study.distributelock.mapper.UnionKeyLockMapper">
+
+    <!-- 根据资源名字获取对应的记录信息 -->
+    <select id="getLockInfoByResourceName" resultType="com.tuacy.study.distributelock.model.UnionKeyLock">
+
+    select
+        id as id,
+        resource_name as resourceName,
+        node_info as nodeInfo,
+        `count` as `count`,
+        des as des,
+        update_time as updateTime,
+        create_time as createTime
+    from unionkeylock
+    where resource_name = #{resourceName}
+
+
+  </select>
+
+
+    <!-- 对应userDao中的insertUser方法，  -->
+    <insert id="insertLockInfo" parameterType="com.tuacy.study.distributelock.model.UnionKeyLock">
+    insert into unionkeylock
+    (
+        resource_name,
+        node_info,
+        `count`,
+        des,
+        update_time,
+        create_time
+    ) values
+    (
+        #{info.resourceName},
+        #{info.nodeInfo},
+        1,
+        #{info.des},
+        now(),
+        now()
+    )
+   </insert>
+
 
 </mapper>

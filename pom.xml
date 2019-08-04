@@ -82,5 +82,18 @@
         </repository>
     </repositories>
 
+    <!-- Maven从什么地方下载插件构件 -->
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-libs-release</id>
+            <url>http://repo.spring.io/libs-release-local</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <!-- 负责管理构件的发布 -->
+    <distributionManagement>
+
+    </distributionManagement>
+
 
 </project>
