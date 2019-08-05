@@ -12,3 +12,4 @@ lock/target
 
 # distributedlock
 distributedlock/distributedlock.iml
+distributedlock/target

@@ -4,10 +4,11 @@ import com.tuacy.study.distributelock.ResourceApplicationContext;
 import com.tuacy.study.distributelock.dao.IUnionKeyLockDao;
 import com.tuacy.study.distributelock.dao.impl.UnionKeyLockDaoImpl;
 import com.tuacy.study.distributelock.model.UnionKeyLock;
+import com.tuacy.study.distributelock.utils.ComputerIdentifierUtil;
 
 public class SqlUnionKeyLock {
 
-    private static final String COMPUTER_UUID = "abc";
+    private static final String COMPUTER_UUID = ComputerIdentifierUtil.getComputerIdentifier();
 
     /**
      * 操作数据库的dao
