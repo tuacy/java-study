@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tuacy.study.distributelock.mapper.OptimisticLockMapper">
+
+    <select id="selectLockResourceInfo" resultType="com.tuacy.study.distributelock.model.OptimisticLock">
+    select
+        id as id,
+        resource_name as resourceName,
+        value as value,
+        `version` as `version`
+    from optimisticlock
+    where resource_name = #{resourceName}
+    </select>
+
+    <!-- 插入 -->
+    <insert id="insertLockResourceValue">
+    insert into optimisticlock
+    (
+        resource_name,
+        `value`,
+        `version`
+    ) values
+    (
+        #{resourceName},
+        #{value},
+        0
+    )
+   </insert>
+
+    <!-- 更新 -->
+    <update id="updateLockResourceValue">
+    update optimisticlock
+    set value = #{value}, version = version + 1
+    where resource_name = #{resourceName} and version = #{version}
+   </update>
+
+</mapper>

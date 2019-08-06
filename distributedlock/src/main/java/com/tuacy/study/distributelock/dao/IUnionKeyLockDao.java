@@ -13,13 +13,38 @@ public interface IUnionKeyLockDao {
     UnionKeyLock getLockInfoByResourceName(String resourceName);
 
     /**
-     * 插入
+     * 删除
      */
-    int insertLockInfo(String resourceName, String nodeInfo);
+    boolean deleteLockInfo(String resourceName, String nodeInfo);
 
     /**
      * 插入
      */
-    int insertLockInfo(UnionKeyLock info);
+    boolean insertLockInfo(String resourceName, String nodeInfo);
+
+    /**
+     * 插入
+     */
+    boolean insertLockInfo(UnionKeyLock info);
+
+    /**
+     * 针对可重入锁做相应的
+     *
+     * @param resourceName 锁对应的资源
+     * @param nodeInfo     节点信息（计算机+线程信息）
+     * @param count        之前加锁次数
+     * @return 是否修改成功
+     */
+    boolean reentrantLock(String resourceName, String nodeInfo, int count);
+
+    /**
+     * 针对可重入锁做相应的
+     *
+     * @param resourceName 锁对应的资源
+     * @param nodeInfo     节点信息（计算机+线程信息）
+     * @param count        之前加锁次数
+     * @return 是否修改成功
+     */
+    boolean reentrantUnLock(String resourceName, String nodeInfo, int count);
 
 }

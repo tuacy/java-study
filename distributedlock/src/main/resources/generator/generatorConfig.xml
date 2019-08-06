@@ -45,7 +45,7 @@
 
         <!-- 要生成哪些表 -->
 
-        <table tableName="unionkeylock" domainObjectName="UnionKeyLock"
+        <table tableName="optimisticlock" domainObjectName="OptimisticLock"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false">

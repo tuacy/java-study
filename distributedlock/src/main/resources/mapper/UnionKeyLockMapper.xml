@@ -41,5 +41,24 @@
     )
    </insert>
 
+    <!-- 可重入锁更新  -->
+    <update id="reentrantLock">
+    update unionkeylock
+    set count = count + 1
+    where resource_name = #{resourceName} and node_info = #{nodeInfo} and count = #{count}
+   </update>
+
+    <!-- 释放可重入锁更新  -->
+    <update id="reentrantUnLock">
+    update unionkeylock
+    set count = count - 1
+    where resource_name = #{resourceName} and node_info = #{nodeInfo} and count = #{count}
+   </update>
+
+    <!-- 删除 -->
+    <delete id="deleteLockInfo">
+    delete from unionkeylock
+    where resource_name = #{resourceName} and node_info = #{nodeInfo}
+   </delete>
 
 </mapper>

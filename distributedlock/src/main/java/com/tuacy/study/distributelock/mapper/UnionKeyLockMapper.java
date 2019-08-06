@@ -22,4 +22,37 @@ public interface UnionKeyLockMapper {
      */
     Integer insertLockInfo(@Param("info") UnionKeyLock info);
 
+    /**
+     * 可重入锁，加锁count+1
+     *
+     * @param resourceName 锁对应的资源信息
+     * @param nodeInfo     节点信息
+     * @param count        锁的次数
+     * @return 更新条数
+     */
+    Integer reentrantLock(@Param("resourceName") String resourceName,
+                          @Param("nodeInfo") String nodeInfo,
+                          @Param("count") int count);
+
+    /**
+     * 可重入锁，释放count-1
+     *
+     * @param resourceName 锁对应的资源信息
+     * @param nodeInfo     节点信息
+     * @param count        锁的次数
+     * @return 更新条数
+     */
+    Integer reentrantUnLock(@Param("resourceName") String resourceName,
+                          @Param("nodeInfo") String nodeInfo,
+                          @Param("count") int count);
+
+    /**
+     * 插入
+     *
+     * @param resourceName 锁对应的资源信息
+     * @param nodeInfo     节点信息
+     */
+    Integer deleteLockInfo(@Param("resourceName") String resourceName,
+                           @Param("nodeInfo") String nodeInfo);
+
 }
