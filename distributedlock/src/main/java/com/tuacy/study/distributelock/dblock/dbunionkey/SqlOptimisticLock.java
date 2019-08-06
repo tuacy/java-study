@@ -1,9 +1,12 @@
 package com.tuacy.study.distributelock.dblock.dbunionkey;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.tuacy.study.distributelock.ResourceApplicationContext;
 import com.tuacy.study.distributelock.dao.IOptimisticLockDao;
 import com.tuacy.study.distributelock.dao.impl.OptimisticLockDaoImpl;
 import com.tuacy.study.distributelock.model.OptimisticLock;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @name: SqlOptimisticLock
@@ -14,6 +17,13 @@ import com.tuacy.study.distributelock.model.OptimisticLock;
  */
 public class SqlOptimisticLock {
 
+    /**
+     * 因为数据库里面限制了最大长度了
+     */
+    private static final int LOCK_LOOP_TIME_WAIT = 200;
+    /**
+     * lock对应的资源名字
+     */
     private final String resourceName;
     /**
      * 操作数据库的dao
@@ -45,10 +55,31 @@ public class SqlOptimisticLock {
      * @param money 存入金额
      */
     public void depositMoney(int money) {
-        // 第一步：版本号信息很重要
-        OptimisticLock dbItemInfo = optimisticLockDao.selectLockResourceInfo(resourceName);
-        // 第二步：
-        // 第三步：
+        boolean success = false;
+        while (!success) {
+            try {
+                // 第一步：版本号信息很重要
+                OptimisticLock dbItemInfo = optimisticLockDao.selectLockResourceInfo(resourceName);
+                // 第二步：做相应的逻辑处理
+                // 第三步：
+                Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
+                if (dbItemInfo == null) {
+                    success = optimisticLockDao.insertLockResourceValue(resourceName, money);
+                } else {
+                    // 更新的时候会去做下版本的判断，相同才更新，不相同不更新
+                    success = optimisticLockDao.updateLockResourceValue(resourceName, dbItemInfo.getVersion(), dbItemInfo.getValue() + money);
+                }
+                if (!success) {
+                    Uninterruptibles.sleepUninterruptibly(LOCK_LOOP_TIME_WAIT, TimeUnit.MILLISECONDS);
+                }
+            } catch (Exception e) {
+//                e.printStackTrace();
+                success = false;
+                Uninterruptibles.sleepUninterruptibly(LOCK_LOOP_TIME_WAIT, TimeUnit.MILLISECONDS);
+
+            }
+
+        }
     }
 
 }

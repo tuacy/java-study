@@ -23,7 +23,7 @@
     (
         #{resourceName},
         #{value},
-        0
+        1
     )
    </insert>
 
