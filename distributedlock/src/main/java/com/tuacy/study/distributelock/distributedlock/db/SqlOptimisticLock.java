@@ -1,4 +1,4 @@
-package com.tuacy.study.distributelock.dblock.dbunionkey;
+package com.tuacy.study.distributelock.distributedlock.db;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.tuacy.study.distributelock.ResourceApplicationContext;

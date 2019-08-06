@@ -1,10 +1,10 @@
-package com.tuacy.study.distributelock.dblock.dbunionkey;
+package com.tuacy.study.distributelock.distributedlock.db;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.tuacy.study.distributelock.ResourceApplicationContext;
 import com.tuacy.study.distributelock.dao.IUnionKeyLockDao;
 import com.tuacy.study.distributelock.dao.impl.UnionKeyLockDaoImpl;
-import com.tuacy.study.distributelock.dblock.IDistributedLock;
+import com.tuacy.study.distributelock.distributedlock.IDistributedLock;
 import com.tuacy.study.distributelock.model.UnionKeyLock;
 import com.tuacy.study.distributelock.utils.ComputerIdentifierUtil;
 

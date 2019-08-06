@@ -8,6 +8,23 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     # 使用druid数据源
     type: com.alibaba.druid.pool.DruidDataSource
+  redis:
+    # Redis数据库索引（默认为0）
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+    password:
+    timeout: 20000 # 连接超时时间 单位 ms（毫秒）
+    # 控制一个 pool 可分配多少个jedis实例
+    jedis:pool:
+      max-active: 8
+      max-wait: -1 #  获取连接时的最大等待毫秒数,小于零:阻塞不确定的时间,默认-1
+      max-idle: 8 # 最大空闲连接数
+      min-idle: 0 # 最小空闲连接数
+  #    #redis集群配置
+  #    cluster:
+  #      nodes: 192.168.177.128:7001,192.168.177.128:7002,192.168.177.128:7003
+  #      max-redirects: 3
 mybatis:
   typeAliasesPackage: com.tuacy.study.distributelock.model
   mapperLocations: classpath:mapper/*.xml

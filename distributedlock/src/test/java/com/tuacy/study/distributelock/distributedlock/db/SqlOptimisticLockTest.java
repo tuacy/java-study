@@ -1,4 +1,4 @@
-package com.tuacy.study.distributelock.dblock.dbunionkey;
+package com.tuacy.study.distributelock.distributedlock.db;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

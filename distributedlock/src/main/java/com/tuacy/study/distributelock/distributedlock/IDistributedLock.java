@@ -1,4 +1,4 @@
-package com.tuacy.study.distributelock.dblock;
+package com.tuacy.study.distributelock.distributedlock;
 
 import java.util.concurrent.TimeUnit;
 

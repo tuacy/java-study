@@ -1,4 +1,4 @@
-package com.tuacy.study.distributelock.dblock.dbunionkey;
+package com.tuacy.study.distributelock.distributedlock.db;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.junit.Test;
@@ -9,37 +9,21 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @name: SqlExclusiveLockTest
+ * @author: tuacy.
+ * @date: 2019/8/6.
+ * @version: 1.0
+ * @Description:
+ */
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class SqlUnionKeyLockTest {
+public class SqlExclusiveLockTest {
 
-    /**
-     * 可重入锁测试
-     */
     @Test
-    public void unionKeyReentrantLockOneThread() {
-        String sourceName = "onThread";
-        SqlUnionKeyLock[] keyLocks = new SqlUnionKeyLock[10];
-        for (int index = 0; index < keyLocks.length; index++) {
-            keyLocks[index] = new SqlUnionKeyLock(sourceName);
-        }
-        // 加锁
-        for (SqlUnionKeyLock keyLock : keyLocks) {
-            keyLock.lock();
-        }
-        // 释放锁
-        for (SqlUnionKeyLock keyLock : keyLocks) {
-            keyLock.unlock();
-        }
+    public void testLock() {
 
-    }
-
-    /**
-     * 开多个线程去获取锁
-     */
-    @Test
-    public void unionKeyReentrantLockMultiThread() {
-        final String sourceName = "multiThread";
+        final String sourceName = "uuid";
         CountDownLatch countDownLatch = new CountDownLatch(10);
         for (int index = 0; index < countDownLatch.getCount(); index++) {
             new LockThread(countDownLatch, index, sourceName).start();
@@ -65,16 +49,15 @@ public class SqlUnionKeyLockTest {
 
         @Override
         public void run() {
-            SqlUnionKeyLock keyLock = new SqlUnionKeyLock(resourceName);
+            SqlExclusiveLock keyLock = new SqlExclusiveLock(resourceName);
             System.out.println("线程(" + index + ")" + "开始获取锁");
             keyLock.lock();
             System.out.println("线程(" + index + ")" + "获取锁成功");
-            Uninterruptibles.sleepUninterruptibly(300, TimeUnit.MILLISECONDS);
+            Uninterruptibles.sleepUninterruptibly(10, TimeUnit.SECONDS);
             keyLock.unlock();
             System.out.println("线程(" + index + ")" + "释放锁");
             countDownLatch.countDown();
         }
     }
-
 
 }
