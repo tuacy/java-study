@@ -30,7 +30,7 @@ public class ZookeeperTest {
     public void zookeeperRunTest() throws Exception {
         System.out.println(zkClient.getChildren("/zookeeper"));
         try {
-            zkClient.getClient().create().withMode(CreateMode.PERSISTENT).forPath("/tuacy2", "".getBytes());
+//            zkClient.getClient().create().withMode(CreateMode.EPHEMERAL).forPath("/tuacy2", "".getBytes());
             System.out.println(zkClient.getChildren("/"));
         } catch (Exception e) {
             e.printStackTrace();

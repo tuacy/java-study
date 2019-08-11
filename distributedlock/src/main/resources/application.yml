@@ -29,9 +29,11 @@ mybatis:
   typeAliasesPackage: com.tuacy.study.distributelock.model
   mapperLocations: classpath:mapper/*.xml
 
+# zeekeeper配置
 zookeeper:
-  server: 127.0.0.1:2181
-  sessionTimeoutMs: 6000
-  connectionTimeoutMs: 6000
-  maxRetries: 3
-  baseSleepTimeMs: 1000
+  server: 127.0.0.1:2181 # 服务器列表，格式host1:port1,host2:port2,...
+  sessionTimeoutMs: 6000 # 会话超时时间，单位毫秒，默认60000ms
+  connectionTimeoutMs: 6000 # 连接创建超时时间，单位毫秒，默认60000ms
+  maxRetries: 3 # 当连接异常时的重试次数
+  baseSleepTimeMs: 1000 # 重试之间等待的初始时间
+  namespace: lock # 为了实现不同的Zookeeper业务之间的隔离，有的时候需要为每个业务分配一个独立的命名空间
