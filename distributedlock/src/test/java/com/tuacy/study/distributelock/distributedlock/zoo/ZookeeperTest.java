@@ -1,7 +1,6 @@
 package com.tuacy.study.distributelock.distributedlock.zoo;
 
 import com.tuacy.study.distributelock.config.ZkClient;
-import org.apache.zookeeper.CreateMode;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +27,10 @@ public class ZookeeperTest {
 
     @Test
     public void zookeeperRunTest() throws Exception {
-        System.out.println(zkClient.getChildren("/zookeeper"));
+        System.out.println(zkClient.getChildrenSync("/zookeeper"));
         try {
 //            zkClient.getClient().create().withMode(CreateMode.EPHEMERAL).forPath("/tuacy2", "".getBytes());
-            System.out.println(zkClient.getChildren("/"));
+            System.out.println(zkClient.getChildrenSync("/"));
         } catch (Exception e) {
             e.printStackTrace();
         }
