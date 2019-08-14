@@ -1,4 +1,4 @@
-package com.tuacy.study.distributelock.distributedlock.zoo;
+package com.tuacy.study.distributelock.distributedlock.zoo.laader;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.tuacy.study.distributelock.config.LeaderSelectorAdapter;
