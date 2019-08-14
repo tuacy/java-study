@@ -1,7 +1,7 @@
-package com.tuacy.study.distributelock.distributedlock.zoo;
+package com.tuacy.study.zookeeper;
 
 import com.google.common.util.concurrent.Uninterruptibles;
-import com.tuacy.study.distributelock.config.ZkClient;
+import com.tuacy.study.zookeeper.config.ZkClient;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;

@@ -1,7 +1,6 @@
 package com.tuacy.study.distributelock.distributedlock.zookeeper;
 
 import com.tuacy.study.distributelock.config.ZkClient;
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

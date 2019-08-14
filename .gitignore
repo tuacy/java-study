@@ -13,3 +13,8 @@ lock/target
 # distributedlock
 distributedlock/distributedlock.iml
 distributedlock/target
+
+# zookeeper
+zookeeper/zookeeper.iml
+zookeeper/target
+/zookeeper/zookeeper.iml

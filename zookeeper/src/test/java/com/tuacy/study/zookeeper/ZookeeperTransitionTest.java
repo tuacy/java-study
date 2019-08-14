@@ -1,6 +1,6 @@
-package com.tuacy.study.distributelock.distributedlock.zoo;
+package com.tuacy.study.zookeeper;
 
-import com.tuacy.study.distributelock.config.ZkClient;
+import com.tuacy.study.zookeeper.config.ZkClient;
 import org.apache.curator.framework.api.transaction.CuratorOp;
 import org.apache.curator.framework.api.transaction.CuratorTransactionResult;
 import org.junit.Test;

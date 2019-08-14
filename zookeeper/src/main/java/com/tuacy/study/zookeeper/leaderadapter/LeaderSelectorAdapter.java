@@ -1,13 +1,10 @@
-package com.tuacy.study.distributelock.config;
+package com.tuacy.study.zookeeper.leaderadapter;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderSelector;
 import org.apache.curator.framework.recipes.leader.LeaderSelectorListenerAdapter;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @name: LeaderSelectorAdapter
@@ -16,24 +13,32 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @version: 1.0
  * @Description:
  */
-public class LeaderSelectorAdapter extends LeaderSelectorListenerAdapter implements Closeable {
-    private final String name;
-    private final LeaderSelector leaderSelector;
-    private final AtomicInteger leaderCount = new AtomicInteger();
+public class LeaderSelectorAdapter extends LeaderSelectorListenerAdapter {
 
-    public LeaderSelectorAdapter(CuratorFramework client, String path, String name) {
-        this.name = name;
+    private final LeaderSelector leaderSelector;
+
+    public LeaderSelectorAdapter(CuratorFramework client, String path, String id) {
+        // 创建一个LeaderSelector对象
         leaderSelector = new LeaderSelector(client, path, this);
+        // 设置id
+        leaderSelector.setId(id);
         // 保证在此实例释放领导权之后还可能获得领导权
         leaderSelector.autoRequeue();
     }
 
-    public void start() throws IOException {
+    /**
+     * 参与选举
+     */
+    public void start() {
+        // 参与选举
         leaderSelector.start();
     }
 
-    @Override
-    public void close() throws IOException {
+    /**
+     * 退出选举
+     */
+    public void close() {
+        // 退出选举
         leaderSelector.close();
     }
 
@@ -42,16 +47,15 @@ public class LeaderSelectorAdapter extends LeaderSelectorListenerAdapter impleme
      */
     @Override
     public void takeLeadership(CuratorFramework client) throws Exception {
-        final int waitSeconds = (int) (5 * Math.random()) + 1;
-        System.out.println(name + " is now the leader. Waiting " + waitSeconds + " seconds...");
-        System.out.println(name + " has been leader " + leaderCount.getAndIncrement() + " time(s) before.");
+        System.out.println(leaderSelector.getId() + " 是leader");
         try {
-            Thread.sleep(TimeUnit.SECONDS.toMillis(waitSeconds));
+            // 当上leader 5s之后，释放leader权利
+            Thread.sleep(TimeUnit.SECONDS.toMillis(10));
         } catch (InterruptedException e) {
-            System.err.println(name + " was interrupted.");
+            System.err.println(leaderSelector.getId() + " 被中断.");
             Thread.currentThread().interrupt();
         } finally {
-            System.out.println(name + " relinquishing leadership.\n");
+            System.out.println(leaderSelector.getId() + " 释放leader的权力。");
         }
     }
 }
