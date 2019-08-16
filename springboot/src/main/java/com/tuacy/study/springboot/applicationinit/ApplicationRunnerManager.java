@@ -1,6 +1,6 @@
 package com.tuacy.study.springboot.applicationinit;
 
-import com.tuacy.study.springboot.AutoStartManager;
+import com.tuacy.study.springboot.scanrunstart.RunStartManager;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -17,6 +17,6 @@ import org.springframework.stereotype.Component;
 public class ApplicationRunnerManager implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        AutoStartManager.INSTANCE.autoStartInvoke();
+        RunStartManager.INSTANCE.autoStartInvoke();
     }
 }

@@ -1,4 +1,4 @@
-package com.tuacy.study.springboot;
+package com.tuacy.study.springboot.scanrunstart;
 
 import com.google.common.collect.Lists;
 import org.springframework.core.io.Resource;
@@ -8,16 +8,15 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
- * @name: AutoStartManager
+ * @name: RunStartManager
  * @author: tuacy.
  * @date: 2019/8/16.
  * @version: 1.0
  * @Description: 自动启动类的管理器
  */
-public enum AutoStartManager {
+public enum RunStartManager {
 
     INSTANCE;
 
@@ -25,7 +24,7 @@ public enum AutoStartManager {
 
     public void autoStartScan(String[] basePackage) {
         // 初始化规约信息
-        List<Class<IAutoStart>> classess;
+        List<Class<IRunStart>> classess;
         try {
             classess = getClassesList(basePackage);
         } catch (Exception e) {
@@ -33,12 +32,12 @@ public enum AutoStartManager {
             return;
         }
         List<InnerAutoStartClassInfo> classInfo = Lists.newArrayList();
-        for (Class<IAutoStart> aClass : classess) {
-            AutoStart annotation = aClass.getAnnotation(AutoStart.class);
+        for (Class<IRunStart> aClass : classess) {
+            RunStart annotation = aClass.getAnnotation(RunStart.class);
             if (annotation == null) {
                 continue;
             }
-            classInfo.add(new InnerAutoStartClassInfo(aClass, annotation.des(), annotation.oder()));
+            classInfo.add(new InnerAutoStartClassInfo(aClass, annotation.des(), annotation.order()));
         }
         startList = classInfo;
     }
@@ -49,7 +48,7 @@ public enum AutoStartManager {
         }
         startList.forEach(item -> {
             try {
-                IAutoStart instance = item.getAutoStartClass().newInstance();
+                IRunStart instance = item.getAutoStartClass().newInstance();
                 instance.start(item.getDes());
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
@@ -64,7 +63,7 @@ public enum AutoStartManager {
      * @param packageNames 包名
      * @return 所有加了规约注解的类
      */
-    public List<Class<IAutoStart>> getClassesList(String[] packageNames) throws Exception {
+    public List<Class<IRunStart>> getClassesList(String[] packageNames) throws Exception {
         if (packageNames == null || packageNames.length == 0) {
             return Lists.newArrayList();
         }
@@ -87,10 +86,10 @@ public enum AutoStartManager {
             }
         }
 
-        List<Class<IAutoStart>> output = Lists.newArrayList();
+        List<Class<IRunStart>> output = Lists.newArrayList();
         for (Class<?> aClass : classes) {
-            if (aClass.isAnnotationPresent(AutoStart.class) && IAutoStart.class.isAssignableFrom(aClass)) {
-                output.add((Class<IAutoStart>) aClass);
+            if (aClass.isAnnotationPresent(RunStart.class) && IRunStart.class.isAssignableFrom(aClass)) {
+                output.add((Class<IRunStart>) aClass);
             }
         }
 
@@ -99,21 +98,21 @@ public enum AutoStartManager {
 
 
     private static class InnerAutoStartClassInfo {
-        Class<IAutoStart> autoStartClass;
+        Class<IRunStart> autoStartClass;
         String des;
         int order;
 
-        public InnerAutoStartClassInfo(Class<IAutoStart> autoStartClass, String des, int order) {
+        public InnerAutoStartClassInfo(Class<IRunStart> autoStartClass, String des, int order) {
             this.autoStartClass = autoStartClass;
             this.des = des;
             this.order = order;
         }
 
-        public Class<IAutoStart> getAutoStartClass() {
+        public Class<IRunStart> getAutoStartClass() {
             return autoStartClass;
         }
 
-        public void setAutoStartClass(Class<IAutoStart> autoStartClass) {
+        public void setAutoStartClass(Class<IRunStart> autoStartClass) {
             this.autoStartClass = autoStartClass;
         }
 

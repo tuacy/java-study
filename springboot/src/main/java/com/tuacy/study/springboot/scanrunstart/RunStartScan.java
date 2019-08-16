@@ -1,11 +1,11 @@
-package com.tuacy.study.springboot;
+package com.tuacy.study.springboot.scanrunstart;
 
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
 
 /**
- * @name: AutoStartScan
+ * @name: RunStartScan
  * @author: tuacy.
  * @date: 2019/8/16.
  * @version: 1.0
@@ -14,9 +14,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-@Import(AutoStartScannerRegister.class)
-public @interface AutoStart {
-    String des() default "";
-
-    int oder() default 0;
+@Import(RunStartScannerRegister.class)
+public @interface RunStartScan {
+    String[] basePackages() default "";
 }

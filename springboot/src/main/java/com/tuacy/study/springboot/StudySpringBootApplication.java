@@ -1,10 +1,12 @@
 package com.tuacy.study.springboot;
 
+import com.tuacy.study.springboot.scanrunstart.RunStartScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@AutoStartScan(basePackages = {"com.tuacy.study.springboot.autostart"})
+// 会去这个包下面查找添加饿了RunStart注解的类，执行指定的方法
+@RunStartScan(basePackages = {"com.tuacy.study.springboot.runstart"})
 public class StudySpringBootApplication {
 
     public static void main(String[] args) {
