@@ -29,6 +29,7 @@
         <module>lock</module>
         <module>distributedlock</module>
         <module>zookeeper</module>
+        <module>springboot</module>
     </modules>
 
     <!-- 公共的依赖，每个module对应依赖这些 -->

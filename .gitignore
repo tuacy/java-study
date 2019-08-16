@@ -17,4 +17,7 @@ distributedlock/target
 # zookeeper
 zookeeper/zookeeper.iml
 zookeeper/target
-/zookeeper/zookeeper.iml
+
+# springboot
+springboot/springboot.iml
+springboot/target
