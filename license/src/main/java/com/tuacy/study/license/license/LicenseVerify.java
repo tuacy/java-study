@@ -54,7 +54,7 @@ public class LicenseVerify {
     }
 
     /**
-     * 安装License证书，读取证书相关的信息, 在bean注册的时候调用该函数
+     * 安装License证书，读取证书相关的信息, 在bean加入容器的时候自动调用
      */
     public void installLicense() {
         try {
@@ -84,7 +84,7 @@ public class LicenseVerify {
     }
 
     /**
-     * 卸载证书
+     * 卸载证书，在bean从容器移除的时候自动调用
      */
     public void unInstallLicense() {
         if (installSuccess) {

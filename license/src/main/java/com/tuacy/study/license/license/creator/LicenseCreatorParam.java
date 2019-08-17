@@ -1,7 +1,7 @@
 package com.tuacy.study.license.license.creator;
 
 
-import com.tuacy.study.license.license.LicenseCheckModel;
+import com.tuacy.study.license.license.LicenseExtraModel;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -70,7 +70,7 @@ public class LicenseCreatorParam implements Serializable {
     /**
      * 额外的服务器硬件校验信息
      */
-    private LicenseCheckModel licenseCheckModel;
+    private LicenseExtraModel licenseExtraModel;
 
     public String getSubject() {
         return subject;
@@ -160,29 +160,12 @@ public class LicenseCreatorParam implements Serializable {
         this.description = description;
     }
 
-    public LicenseCheckModel getLicenseCheckModel() {
-        return licenseCheckModel;
+    public LicenseExtraModel getLicenseExtraModel() {
+        return licenseExtraModel;
     }
 
-    public void setLicenseCheckModel(LicenseCheckModel licenseCheckModel) {
-        this.licenseCheckModel = licenseCheckModel;
+    public void setLicenseExtraModel(LicenseExtraModel licenseExtraModel) {
+        this.licenseExtraModel = licenseExtraModel;
     }
 
-    @Override
-    public String toString() {
-        return "LicenseCreatorParam{" +
-                "subject='" + subject + '\'' +
-                ", privateAlias='" + privateAlias + '\'' +
-                ", keyPass='" + keyPass + '\'' +
-                ", storePass='" + storePass + '\'' +
-                ", licensePath='" + licensePath + '\'' +
-                ", privateKeysStorePath='" + privateKeysStorePath + '\'' +
-                ", issuedTime=" + issuedTime +
-                ", expiryTime=" + expiryTime +
-                ", consumerType='" + consumerType + '\'' +
-                ", consumerAmount=" + consumerAmount +
-                ", description='" + description + '\'' +
-                ", licenseCheckModel=" + licenseCheckModel +
-                '}';
-    }
 }

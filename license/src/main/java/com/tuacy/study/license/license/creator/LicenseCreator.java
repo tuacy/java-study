@@ -78,9 +78,9 @@ public class LicenseCreator {
         licenseContent.setConsumerAmount(param.getConsumerAmount());
         licenseContent.setInfo(param.getDescription());
 
-        //扩展校验，这里可以自定义一些额外的校验信息
-        if (param.getLicenseCheckModel() != null) {
-            licenseContent.setExtra(param.getLicenseCheckModel());
+        //扩展校验，这里可以自定义一些额外的校验信息(也可以用json字符串保存)
+        if (param.getLicenseExtraModel() != null) {
+            licenseContent.setExtra(param.getLicenseExtraModel());
         }
 
         return licenseContent;

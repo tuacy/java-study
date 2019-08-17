@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * 自定义KeyStoreParam，用于将公私钥存储文件存放到其他磁盘位置而不是项目中
+ * 自定义KeyStoreParam，用于将公私钥存储文件存放到其他磁盘位置而不是项目中。现场使用的时候公钥大部分都不会放在项目中的
  */
 public class CustomKeyStoreParam extends AbstractKeyStoreParam {
 
