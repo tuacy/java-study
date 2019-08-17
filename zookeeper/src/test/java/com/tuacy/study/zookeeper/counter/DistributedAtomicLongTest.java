@@ -1,6 +1,7 @@
 package com.tuacy.study.zookeeper.counter;
 
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.Uninterruptibles;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -12,6 +13,7 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @name: DistributedAtomicLongTest
@@ -39,8 +41,18 @@ public class DistributedAtomicLongTest {
         @Override
         public void run() {
             try {
-                AtomicValue<Long> value = counter.increment();
-                System.out.println("succeed: " + value.succeeded() + " value:" + value.postValue());
+                for (int index = 0; index < 5; index++) {
+                    // 保证成功
+                    while (true) {
+                        AtomicValue<Long> value = counter.increment();
+                        if (value.succeeded()) {
+                            System.out.println("succeed: " + value.succeeded() + " value:" + value.postValue());
+                            break;
+                        }
+                        Uninterruptibles.sleepUninterruptibly(3, TimeUnit.SECONDS);
+
+                    }
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -77,8 +89,8 @@ public class DistributedAtomicLongTest {
         for (int index = 0; index < zookeeperClientList.size(); index++) {
             // 乐观锁模式
             DistributedAtomicLong count = new DistributedAtomicLong(zookeeperClientList.get(index), PATH_COUNTER, new RetryNTimes(10, 10));
-           boolean initializeSuccess =  count.initialize(0L);
-            if(initializeSuccess) {
+            boolean initializeSuccess = count.initialize(0L);
+            if (initializeSuccess) {
                 System.out.println("初始化成功");
             } else {
                 System.out.println("初始化失败");

@@ -22,7 +22,6 @@ public class InterProcessMutexTest {
 
     private static final String LOCK_PATH = "/tuacy/interProcessMutexTest";
 
-
     class LockThread extends Thread {
 
         private final CuratorFramework client;
