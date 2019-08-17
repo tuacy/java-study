@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: study-springboot
+
+
+#License相关配置
+license:
+  subject: ioserver #主题
+  publicAlias: publicCert #公钥别称
+  storePass: a123456 #访问公钥的密码
+  licensePath: D:\licenseTest\license.lic #license位置
+  publicKeysStorePath: D:\licenseTest\publicCerts.keystore #公钥位置

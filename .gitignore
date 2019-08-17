@@ -21,3 +21,7 @@ zookeeper/target
 # springboot
 springboot/springboot.iml
 springboot/target
+
+# license
+license/license.iml
+license/target
