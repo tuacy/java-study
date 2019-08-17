@@ -55,6 +55,7 @@ public class SharedCountTest {
                 e.printStackTrace();
             } finally {
                 try {
+                    System.out.println("当前值为：" + counter.getCount());
                     counter.close();
                 } catch (Exception e) {
                     //ignore
