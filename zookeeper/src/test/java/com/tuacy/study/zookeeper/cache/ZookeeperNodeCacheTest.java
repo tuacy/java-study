@@ -1,15 +1,14 @@
-package com.tuacy.study.zookeeper;
+package com.tuacy.study.zookeeper.cache;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.tuacy.study.zookeeper.config.ZkClient;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.recipes.cache.PathChildrenCache;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
+import org.apache.curator.framework.recipes.cache.ChildData;
+import org.apache.curator.framework.recipes.cache.NodeCache;
+import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.zookeeper.data.Stat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +24,12 @@ import java.util.concurrent.TimeUnit;
  * @version: 1.0
  * @Description:
  */
-public class ZookeeperPathCacheTest {
+public class ZookeeperNodeCacheTest {
+
 
 
     @Test
-    public void pathChildrenCache() throws Exception {
+    public void nodeCache() throws Exception {
 
         // 创建zookeeper客户端
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
@@ -42,20 +42,27 @@ public class ZookeeperPathCacheTest {
         // 启动客户端
         client.start();
 
-        PathChildrenCache cache = new PathChildrenCache(client, "/tuacy/pathCache", true);
+        final NodeCache cache = new NodeCache(client, "/tuacy/nodeCache");
+        cache.start();
         // 添加监听
-        cache.getListenable().addListener(new PathChildrenCacheListener() {
+        cache.getListenable().addListener(new NodeCacheListener() {
+
             @Override
-            public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
-                System.out.println("事件类型：" + event.getType());
-                if (null != event.getData()) {
-                    System.out.println("节点数据：" + event.getData().getPath() + " = " + new String(event.getData().getData()));
+            public void nodeChanged() throws Exception {
+                ChildData data = cache.getCurrentData();
+                if (null != data) {
+                    System.out.println("节点数据：" + new String(cache.getCurrentData().getData()));
+                } else {
+                    System.out.println("节点被删除!");
                 }
             }
         });
-        cache.start();
         // 添加节点
-        client.create().creatingParentContainersIfNeeded().forPath("/tuacy/pathCache/001");
+        client.create().creatingParentsIfNeeded().forPath("/tuacy/nodeCache");
+        Uninterruptibles.sleepUninterruptibly(10, TimeUnit.SECONDS);
+        client.setData().forPath("/tuacy/nodeCache", "abc".getBytes());
+        Uninterruptibles.sleepUninterruptibly(10, TimeUnit.SECONDS);
+        client.delete().forPath("/tuacy/nodeCache");
         Uninterruptibles.sleepUninterruptibly(30, TimeUnit.SECONDS);
         cache.close();
     }

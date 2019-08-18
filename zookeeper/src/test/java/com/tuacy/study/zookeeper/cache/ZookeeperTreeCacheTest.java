@@ -1,20 +1,20 @@
-package com.tuacy.study.zookeeper;
+package com.tuacy.study.zookeeper.cache;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.tuacy.study.zookeeper.config.ZkClient;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.recipes.cache.ChildData;
-import org.apache.curator.framework.recipes.cache.NodeCache;
-import org.apache.curator.framework.recipes.cache.NodeCacheListener;
+import org.apache.curator.framework.recipes.cache.*;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.curator.utils.ThreadUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -24,8 +24,7 @@ import java.util.concurrent.TimeUnit;
  * @version: 1.0
  * @Description:
  */
-public class ZookeeperNodeCacheTest {
-
+public class ZookeeperTreeCacheTest {
 
 
     @Test
@@ -41,29 +40,36 @@ public class ZookeeperNodeCacheTest {
                 .build();
         // 启动客户端
         client.start();
-
-        final NodeCache cache = new NodeCache(client, "/tuacy/nodeCache");
-        cache.start();
+        final TreeCache cache = TreeCache.newBuilder(client, "/tuacy/treeCache")
+                .setCacheData(true)
+                .build();
         // 添加监听
-        cache.getListenable().addListener(new NodeCacheListener() {
+        cache.getListenable().addListener(new TreeCacheListener() {
 
             @Override
-            public void nodeChanged() throws Exception {
-                ChildData data = cache.getCurrentData();
-                if (null != data) {
-                    System.out.println("节点数据：" + new String(cache.getCurrentData().getData()));
-                } else {
-                    System.out.println("节点被删除!");
-                }
+            public void childEvent(CuratorFramework client, TreeCacheEvent event) throws Exception {
+                System.out.println("事件类型：" + event.getType() + " | 路径：" + (null != event.getData() ? event.getData().getPath() : null));
             }
         });
+        cache.start();
         // 添加节点
-        client.create().creatingParentsIfNeeded().forPath("/tuacy/nodeCache");
+        client.create().creatingParentsIfNeeded().forPath("/tuacy/treeCache");
         Uninterruptibles.sleepUninterruptibly(10, TimeUnit.SECONDS);
-        client.setData().forPath("/tuacy/nodeCache", "abc".getBytes());
+        // 给节点设置数据
+        client.setData().forPath("/tuacy/treeCache", "abc".getBytes());
+        // 创建子节点
+        client.create().creatingParentsIfNeeded().forPath("/tuacy/treeCache/001");
         Uninterruptibles.sleepUninterruptibly(10, TimeUnit.SECONDS);
-        client.delete().forPath("/tuacy/nodeCache");
+        // 修改子节点的数据
+        client.setData().forPath("/tuacy/treeCache/001", "abc".getBytes());
+        Uninterruptibles.sleepUninterruptibly(10, TimeUnit.SECONDS);
+        // 删除子节点
+        client.delete().forPath("/tuacy/treeCache/001");
+        Uninterruptibles.sleepUninterruptibly(10, TimeUnit.SECONDS);
+        // 删除节点
+        client.delete().forPath("/tuacy/treeCache");
         Uninterruptibles.sleepUninterruptibly(30, TimeUnit.SECONDS);
         cache.close();
+        client.close();
     }
 }
