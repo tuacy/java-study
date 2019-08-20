@@ -1,4 +1,4 @@
-package com.tuacy.study.distributelock.distributedlock.db;
+package com.tuacy.study.distributelock.distributedlock.db.optimistic;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.tuacy.study.distributelock.ResourceApplicationContext;

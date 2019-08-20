@@ -1,5 +1,10 @@
 # 配置自定义Starter的自动化配置
-org.springframework.boot.autoconfigure.EnableAutoConfiguration = \
-com.tuacy.study.distributelock.config.DistributedLockAutoConfiguration, \
-com.tuacy.study.distributelock.asp.DistributedLockAspectConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.tuacy.study.distributelock.config.RedisDistributedLockConfiguration, \
+com.tuacy.study.distributelock.distributedlock.redis.RedisDistributedLockAspect, \
+com.tuacy.study.distributelock.config.DbDistributedLockConfiguration, \
+com.tuacy.study.distributelock.distributedlock.db.DbDistributedLockAspect, \
+com.tuacy.study.distributelock.config.ZkConfiguration, \
+com.tuacy.study.distributelock.config.ZookeeperLockConfiguration
+
 

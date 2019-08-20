@@ -11,7 +11,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 @Configuration
 @AutoConfigureAfter(RedisAutoConfiguration.class)
-public class DistributedLockAutoConfiguration {
+public class RedisDistributedLockConfiguration {
+
     @Bean
     @ConditionalOnBean(RedisTemplate.class)
     public IRedisDistributedLock redisDistributedLock(RedisTemplate<Object, Object> redisTemplate) {

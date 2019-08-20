@@ -1,8 +1,7 @@
-package com.tuacy.study.distributelock.asp;
+package com.tuacy.study.distributelock.distributedlock.redis;
 
-import com.tuacy.study.distributelock.config.DistributedLockAutoConfiguration;
-import com.tuacy.study.distributelock.distributedlock.redis.IRedisDistributedLock;
-import com.tuacy.study.distributelock.distributedlock.redis.RedisLock;
+import com.tuacy.study.distributelock.config.RedisDistributedLockConfiguration;
+import com.tuacy.study.distributelock.distributedlock.LockFailAction;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -29,10 +28,10 @@ import java.util.Arrays;
 @Aspect
 @Configuration
 @ConditionalOnClass(IRedisDistributedLock.class)
-@AutoConfigureAfter(DistributedLockAutoConfiguration.class)
-public class DistributedLockAspectConfiguration {
+@AutoConfigureAfter(RedisDistributedLockConfiguration.class)
+public class RedisDistributedLockAspect {
 
-    private final Logger logger = LoggerFactory.getLogger(DistributedLockAspectConfiguration.class);
+    private final Logger logger = LoggerFactory.getLogger(RedisDistributedLockAspect.class);
 
     @Autowired
     private IRedisDistributedLock distributedLock;
@@ -46,12 +45,12 @@ public class DistributedLockAspectConfiguration {
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
         Method method = ((MethodSignature) pjp.getSignature()).getMethod();
         RedisLock redisLock = method.getAnnotation(RedisLock.class);
-        String key = redisLock.value();
+        String key = redisLock.key();
         if (StringUtils.isEmpty(key)) {
             Object[] args = pjp.getArgs();
             key = Arrays.toString(args);
         }
-        int retryTimes = redisLock.action().equals(RedisLock.LockFailAction.CONTINUE) ? redisLock.retryTimes() : 0;
+        int retryTimes = redisLock.action().equals(LockFailAction.CONTINUE) ? redisLock.retryTimes() : 0;
         boolean lock = distributedLock.lock(key, redisLock.keepMills(), retryTimes, redisLock.sleepMills());
         if (!lock) {
             logger.debug("get lock failed : " + key);
@@ -65,7 +64,7 @@ public class DistributedLockAspectConfiguration {
         } catch (Exception e) {
             logger.error("execute locked method occured an exception", e);
         } finally {
-            boolean releaseResult = distributedLock.releaseLock(key);
+            boolean releaseResult = distributedLock.unlock(key);
             logger.debug("release lock : " + key + (releaseResult ? " success" : " failed"));
         }
         return null;

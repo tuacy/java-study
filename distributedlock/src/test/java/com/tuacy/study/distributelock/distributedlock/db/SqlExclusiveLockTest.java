@@ -1,6 +1,7 @@
 package com.tuacy.study.distributelock.distributedlock.db;
 
 import com.google.common.util.concurrent.Uninterruptibles;
+import com.tuacy.study.distributelock.distributedlock.db.exclusive.SqlExclusiveLock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;

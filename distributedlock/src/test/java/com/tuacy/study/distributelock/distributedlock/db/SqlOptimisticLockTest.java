@@ -1,5 +1,6 @@
 package com.tuacy.study.distributelock.distributedlock.db;
 
+import com.tuacy.study.distributelock.distributedlock.db.optimistic.SqlOptimisticLock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;

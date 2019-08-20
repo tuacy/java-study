@@ -27,7 +27,7 @@ public class RedisDistributedLockTest {
     public void redisLock() {
         System.out.println("加锁：" + redisDistributedLock.lock("orderNum"));
         Uninterruptibles.sleepUninterruptibly(60, TimeUnit.SECONDS);
-        System.out.println("释放锁：" + redisDistributedLock.releaseLock("orderNum"));
+        System.out.println("释放锁：" + redisDistributedLock.unlock("orderNum"));
 
     }
 

@@ -1,8 +1,9 @@
 package com.tuacy.study.distributelock.distributedlock.zookeeper;
 
 import com.tuacy.study.distributelock.config.ZkClient;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @name: ZookeeperLock
@@ -11,34 +12,45 @@ import org.springframework.stereotype.Component;
  * @version: 1.0
  * @Description:
  */
-@Component
-public class ZookeeperLock {
+public class ZookeeperLock implements IZookeeperLock {
 
-    private static final String LOCK_ROOT = "lock";
+    private static final String LOCK_ROOT = "/lock";
+    private InterProcessMutex interProcessMutex;
 
-    private String lockName;
-
-    private ZkClient zkClient;
-
-    @Autowired
-    public void setZkClient(ZkClient zkClient) {
-        this.zkClient = zkClient;
+    public ZookeeperLock(ZkClient zkClient) {
+        interProcessMutex = new InterProcessMutex(zkClient.getClient(), LOCK_ROOT);
     }
 
-//    private boolean lock(String lockName) {
-//        this.lockName = lockName;
-//
-//
-//        return true;
-//
-//    }
-//
-//    private boolean waitOtherLock(String waitLock, int sessionTimeout) {
-//        String waitLockNode = LOCK_ROOT + "/" + waitLock;
-//
-//        //分布式锁
-//        InterProcessMutex lock = new InterProcessMutex(zkClient.getClient(), "/lock");
-//        lock.acquire();
-//    }
+    @Override
+    public boolean lock() {
+        try {
+            interProcessMutex.acquire();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean lock(long time, TimeUnit unit) {
+        try {
+            interProcessMutex.acquire(time, unit);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public void unlock() {
+        try {
+            interProcessMutex.release();
+        } catch (Exception e) {
+            e.printStackTrace();
+            // ignore
+        }
+    }
 
 }

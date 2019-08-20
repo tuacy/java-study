@@ -1,22 +1,25 @@
-package com.tuacy.study.distributelock.distributedlock.redis;
+package com.tuacy.study.distributelock.distributedlock.db;
 
 import com.tuacy.study.distributelock.distributedlock.LockFailAction;
 
 import java.lang.annotation.*;
 
+/**
+ * @name: DbLock
+ * @author: tuacy.
+ * @date: 2019/8/20.
+ * @version: 1.0
+ * @Description:
+ */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-public @interface RedisLock {
+public @interface DbLock {
+
     /**
      * 锁的资源，redis的key
      */
     String key() default "default";
-
-    /**
-     * 持锁时间,单位毫秒
-     */
-    long keepMills() default 30000;
 
     /**
      * 当获取失败时候动作
@@ -32,4 +35,5 @@ public @interface RedisLock {
      * 重试次数
      */
     int retryTimes() default 5;
+
 }

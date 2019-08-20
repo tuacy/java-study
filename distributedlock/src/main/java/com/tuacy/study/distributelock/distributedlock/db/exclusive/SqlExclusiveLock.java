@@ -1,4 +1,4 @@
-package com.tuacy.study.distributelock.distributedlock.db;
+package com.tuacy.study.distributelock.distributedlock.db.exclusive;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.tuacy.study.distributelock.ResourceApplicationContext;
@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -57,15 +58,14 @@ public class SqlExclusiveLock implements IDistributedLock {
         }
         boolean success = false;
         while (!success) {
+            PreparedStatement preparedStatement = null;
             try {
                 sqlConnection = jdbcTemplate.getDataSource().getConnection();
                 sqlConnection.setAutoCommit(false);//设置手动提交
                 String prepareSql = "select * from exclusivelock where resource_name = ? for update";
-                PreparedStatement preparedStatement = sqlConnection.prepareStatement(prepareSql);
+                preparedStatement = sqlConnection.prepareStatement(prepareSql);
                 preparedStatement.setString(1, this.resourceName);
                 success = preparedStatement.executeQuery() != null;
-                // 从preparedStatement里面获取结果
-                preparedStatement.close();
                 if (!success) {
                     Uninterruptibles.sleepUninterruptibly(LOCK_LOOP_TIME_WAIT, TimeUnit.MILLISECONDS);
                 }
@@ -73,6 +73,14 @@ public class SqlExclusiveLock implements IDistributedLock {
                 e.printStackTrace();
                 success = false;
                 Uninterruptibles.sleepUninterruptibly(LOCK_LOOP_TIME_WAIT, TimeUnit.MILLISECONDS);
+            } finally {
+                if (preparedStatement != null) {
+                    try {
+                        preparedStatement.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
     }

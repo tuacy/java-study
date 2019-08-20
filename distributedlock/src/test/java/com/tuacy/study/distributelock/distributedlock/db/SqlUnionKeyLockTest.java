@@ -3,6 +3,7 @@ package com.tuacy.study.distributelock.distributedlock.db;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -13,23 +14,26 @@ import java.util.concurrent.TimeUnit;
 @RunWith(SpringRunner.class)
 public class SqlUnionKeyLockTest {
 
+    private IDbDistributedLock dbDistributedLock;
+
+    @Autowired
+    public void setDbDistributedLock(IDbDistributedLock dbDistributedLock) {
+        this.dbDistributedLock = dbDistributedLock;
+    }
+
     /**
      * 可重入锁测试
      */
     @Test
     public void unionKeyReentrantLockOneThread() {
         String sourceName = "onThread";
-        SqlUnionKeyLock[] keyLocks = new SqlUnionKeyLock[10];
-        for (int index = 0; index < keyLocks.length; index++) {
-            keyLocks[index] = new SqlUnionKeyLock(sourceName);
-        }
         // 加锁
-        for (SqlUnionKeyLock keyLock : keyLocks) {
-            keyLock.lock();
+        for (int index = 0; index < 10; index++) {
+            dbDistributedLock.lock(sourceName);
         }
         // 释放锁
-        for (SqlUnionKeyLock keyLock : keyLocks) {
-            keyLock.unlock();
+        for (int index = 0; index < 10; index++) {
+            dbDistributedLock.unlock(sourceName);
         }
 
     }
@@ -65,12 +69,11 @@ public class SqlUnionKeyLockTest {
 
         @Override
         public void run() {
-            SqlUnionKeyLock keyLock = new SqlUnionKeyLock(resourceName);
             System.out.println("线程(" + index + ")" + "开始获取锁");
-            keyLock.lock();
+            dbDistributedLock.lock(resourceName);
             System.out.println("线程(" + index + ")" + "获取锁成功");
             Uninterruptibles.sleepUninterruptibly(300, TimeUnit.MILLISECONDS);
-            keyLock.unlock();
+            dbDistributedLock.unlock(resourceName);
             System.out.println("线程(" + index + ")" + "释放锁");
             countDownLatch.countDown();
         }

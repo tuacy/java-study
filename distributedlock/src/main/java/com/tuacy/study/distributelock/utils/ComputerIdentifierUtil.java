@@ -18,7 +18,7 @@ public class ComputerIdentifierUtil {
      *
      * @return A string containing four hyphen-delimited fields representing the
      * processor; the first 3 are 32-bit hexadecimal values and the last one
-     * is an integer value.
+     * is an integer key.
      */
     public static String getComputerIdentifier() {
         SystemInfo systemInfo = new SystemInfo();

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class RedisDistributedLock extends AbstractDistributedLock {
+
     private final Logger logger = LoggerFactory.getLogger(RedisDistributedLock.class);
 
     private RedisTemplate<Object, Object> redisTemplate;
@@ -44,6 +45,9 @@ public class RedisDistributedLock extends AbstractDistributedLock {
         this.redisTemplate = redisTemplate;
     }
 
+    /**
+     * 加锁
+     */
     @Override
     public boolean lock(String key, long expire, int retryTimes, long sleepMillis) {
         boolean result = setRedis(key, expire);
@@ -68,16 +72,16 @@ public class RedisDistributedLock extends AbstractDistributedLock {
                 String uuid = UUID.randomUUID().toString();
                 lockFlag.set(uuid);
                 /**
-                 * 存储数据到缓存中，并制定过期时间和当Key存在时是否覆盖。
+                 * 存储数据到缓存中，并指定过期时间和当Key存在时是否覆盖。
                  *
-                 * @param key
-                 * @param value
+                 * @param key 键
+                 * @param key 键值
                  * @param nxxx
-                 *            nxxx的值只能取NX或者XX，如果取NX，则只有当key不存在是才进行set，如果取XX，则只有当key已经存在时才进行set
+                 *            nxxx的值只能取NX或者XX，如果是NX的时候，则只有当key不存在是才进行set，如果是XX，则只有当key已经存在时才进行set
                  *
                  * @param expx expx的值只能取EX或者PX，代表数据过期时间的单位，EX代表秒，PX代表毫秒。
                  * @param time 过期时间，单位是expx所代表的单位。
-                 * @return
+                 * @return 成功返回“ok”，失败则返回 null。
                  */
                 return commands.set(key, uuid, "NX", "PX", expire);
             });
@@ -88,8 +92,11 @@ public class RedisDistributedLock extends AbstractDistributedLock {
         return false;
     }
 
+    /**
+     * 释放锁
+     */
     @Override
-    public boolean releaseLock(String key) {
+    public boolean unlock(String key) {
         // 释放锁的时候，有可能因为持锁之后方法执行时间大于锁的有效期，此时有可能已经被另外一个线程持有锁，所以不能直接删除
         try {
             List<String> keys = new ArrayList<>();

@@ -22,7 +22,7 @@ public interface OptimisticLockMapper {
      * @param value        锁定的资源对应的值
      * @return 插入条数
      */
-    Integer insertLockResourceValue(@Param("resourceName") String resourceName, @Param("value") int value);
+    Integer insertLockResourceValue(@Param("resourceName") String resourceName, @Param("key") int value);
 
 
     /**
@@ -33,5 +33,5 @@ public interface OptimisticLockMapper {
      * @param value        锁定的资源对应的值
      * @return 更新条数
      */
-    Integer updateLockResourceValue(@Param("resourceName") String resourceName, @Param("version") int version, @Param("value") int value);
+    Integer updateLockResourceValue(@Param("resourceName") String resourceName, @Param("version") int version, @Param("key") int value);
 }
