@@ -1,7 +1,7 @@
 package com.tuacy.study.distributelock.config;
 
 import com.tuacy.study.distributelock.distributedlock.redis.IRedisDistributedLock;
-import com.tuacy.study.distributelock.distributedlock.redis.RedisDistributedLock;
+import com.tuacy.study.distributelock.distributedlock.redis.RedisDistributedLockImpl;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
@@ -16,6 +16,6 @@ public class RedisDistributedLockConfiguration {
     @Bean
     @ConditionalOnBean(RedisTemplate.class)
     public IRedisDistributedLock redisDistributedLock(RedisTemplate<Object, Object> redisTemplate) {
-        return new RedisDistributedLock(redisTemplate);
+        return new RedisDistributedLockImpl(redisTemplate);
     }
 }

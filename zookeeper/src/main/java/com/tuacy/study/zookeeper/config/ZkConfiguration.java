@@ -45,16 +45,16 @@ public class ZkConfiguration {
     @Value("${zookeeper.namespace}")
     private String namespace;
 
-    @Bean(initMethod = "init", destroyMethod = "stop")
-    public ZkClient zkClient() {
-        ZkClient zkClient = new ZkClient();
-        zkClient.setZookeeperServer(zookeeperServer);
-        zkClient.setSessionTimeoutMs(sessionTimeoutMs);
-        zkClient.setConnectionTimeoutMs(connectionTimeoutMs);
-        zkClient.setMaxRetries(maxRetries);
-        zkClient.setBaseSleepTimeMs(baseSleepTimeMs);
-        zkClient.setNamespace(namespace);
-        return zkClient;
-    }
+//    @Bean(initMethod = "init", destroyMethod = "stop")
+//    public ZkClient zkClient() {
+//        ZkClient zkClient = new ZkClient();
+//        zkClient.setZookeeperServer(zookeeperServer);
+//        zkClient.setSessionTimeoutMs(sessionTimeoutMs);
+//        zkClient.setConnectionTimeoutMs(connectionTimeoutMs);
+//        zkClient.setMaxRetries(maxRetries);
+//        zkClient.setBaseSleepTimeMs(baseSleepTimeMs);
+//        zkClient.setNamespace(namespace);
+//        return zkClient;
+//    }
 
 }

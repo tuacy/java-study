@@ -5,6 +5,7 @@ com.tuacy.study.distributelock.distributedlock.redis.RedisDistributedLockAspect,
 com.tuacy.study.distributelock.config.DbDistributedLockConfiguration, \
 com.tuacy.study.distributelock.distributedlock.db.DbDistributedLockAspect, \
 com.tuacy.study.distributelock.config.ZkConfiguration, \
-com.tuacy.study.distributelock.config.ZookeeperLockConfiguration
+com.tuacy.study.distributelock.config.ZookeeperLockConfiguration, \
+com.tuacy.study.distributelock.distributedlock.zookeeper.ZookeeperDistributedLockAspect
 
 

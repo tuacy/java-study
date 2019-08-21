@@ -2,7 +2,7 @@ package com.tuacy.study.distributelock.config;
 
 import com.tuacy.study.distributelock.dao.IUnionKeyLockDao;
 import com.tuacy.study.distributelock.distributedlock.db.IDbDistributedLock;
-import com.tuacy.study.distributelock.distributedlock.db.unionkey.SqlUnionKeyLock;
+import com.tuacy.study.distributelock.distributedlock.db.unionkey.DbDistributedUnionKeyLock;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -16,6 +16,6 @@ public class DbDistributedLockConfiguration {
     @Bean
     @ConditionalOnBean(IUnionKeyLockDao.class)
     public IDbDistributedLock dbDistributedLock(IUnionKeyLockDao unionKeyLockDao) {
-        return new SqlUnionKeyLock(unionKeyLockDao);
+        return new DbDistributedUnionKeyLock(unionKeyLockDao);
     }
 }

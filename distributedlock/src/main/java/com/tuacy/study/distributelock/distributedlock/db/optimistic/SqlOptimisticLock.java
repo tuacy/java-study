@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * @author: tuacy.
  * @date: 2019/8/6.
  * @version: 1.0
- * @Description: 数据库乐观锁 -- 这里我们简单的模拟一个存钱的场景
+ * @Description: 数据库乐观锁 基于字段版本号做分布式锁 -- 这里我们简单的模拟一个存钱的场景
  */
 public class SqlOptimisticLock {
 
@@ -58,11 +58,11 @@ public class SqlOptimisticLock {
         boolean success = false;
         while (!success) {
             try {
-                // 第一步：版本号信息很重要
+                // 第一步：版本号信息很重要，从表里面取出数据(包括版本号)
                 OptimisticLock dbItemInfo = optimisticLockDao.selectLockResourceInfo(resourceName);
-                // 第二步：做相应的逻辑处理
-                // 第三步：
+                // 第二步：todo:做相应的逻辑处理
                 Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
+                // 第三步：把数据存到数据库里面去
                 if (dbItemInfo == null) {
                     success = optimisticLockDao.insertLockResourceValue(resourceName, money);
                 } else {

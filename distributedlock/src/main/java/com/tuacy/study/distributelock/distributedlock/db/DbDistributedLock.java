@@ -5,7 +5,7 @@ import com.tuacy.study.distributelock.distributedlock.LockFailAction;
 import java.lang.annotation.*;
 
 /**
- * @name: DbLock
+ * @name: DbDistributedLock
  * @author: tuacy.
  * @date: 2019/8/20.
  * @version: 1.0
@@ -14,7 +14,7 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-public @interface DbLock {
+public @interface DbDistributedLock {
 
     /**
      * 锁的资源，redis的key

@@ -1,11 +1,17 @@
 package com.tuacy.study.distributelock.distributedlock.db;
 
 import com.google.common.util.concurrent.Uninterruptibles;
+import com.tuacy.study.distributelock.config.DbDistributedLockConfiguration;
+import com.tuacy.study.distributelock.config.RedisDistributedLockConfiguration;
+import com.tuacy.study.distributelock.config.ZkConfiguration;
+import com.tuacy.study.distributelock.config.ZookeeperLockConfiguration;
 import com.tuacy.study.distributelock.distributedlock.db.exclusive.SqlExclusiveLock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -17,8 +23,16 @@ import java.util.concurrent.TimeUnit;
  * @version: 1.0
  * @Description:
  */
-@SpringBootTest
 @RunWith(SpringRunner.class)
+@SpringBootTest
+@ContextConfiguration(
+        classes = {
+                DbDistributedLockConfiguration.class,
+                RedisDistributedLockConfiguration.class,
+                ZkConfiguration.class,
+                ZookeeperLockConfiguration.class
+        },
+        loader = AnnotationConfigContextLoader.class)
 public class SqlExclusiveLockTest {
 
     @Test

@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * @author: tuacy.
  * @date: 2019/8/6.
  * @version: 1.0
- * @Description: 排他锁 实现分布式锁
+ * @Description: 排他锁 实现分布式锁，这种形式不太好，容易产生死锁的情况
  */
 public class SqlExclusiveLock implements IDistributedLock {
 

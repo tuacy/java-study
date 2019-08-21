@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * 1. 可重入锁
  * 2. 非公平锁
  */
-public class SqlUnionKeyLock extends AbstractDbDistributedLock {
+public class DbDistributedUnionKeyLock extends AbstractDbDistributedLock {
     /**
      * 因为数据库里面限制了最大长度了
      */
@@ -24,14 +24,16 @@ public class SqlUnionKeyLock extends AbstractDbDistributedLock {
      * 计算机唯一标识 为可重入锁做准备(一定要确保每个机器的值不同)
      */
     private static final String COMPUTER_UUID = ComputerIdentifierUtil.getComputerIdentifier();
+    /**
+     * 线程变量
+     */
     private ThreadLocal<String> threadFlag = new ThreadLocal<>();
-
     /**
      * 操作数据库的dao
      */
     private IUnionKeyLockDao unionKeyLockDao;
 
-    public SqlUnionKeyLock(IUnionKeyLockDao unionKeyLockDao) {
+    public DbDistributedUnionKeyLock(IUnionKeyLockDao unionKeyLockDao) {
         this.unionKeyLockDao = unionKeyLockDao;
     }
 
@@ -41,7 +43,7 @@ public class SqlUnionKeyLock extends AbstractDbDistributedLock {
     @Override
     public boolean lock(String key, int retryTimes, long sleepMillis) {
         boolean lockSuccess = false;
-        // 机器码+线程uuid -- 唯一标识
+        // 机器码+线程uuid -- 唯一标识（保证同一台电脑的同一个线程是一样的）
         if (threadFlag.get() == null || threadFlag.get().isEmpty()) {
             String nodeTemp = COMPUTER_UUID + "#" + String.format("%08x", UUID.randomUUID().hashCode()) + "#" + Thread.currentThread().getId();
             if (nodeTemp.length() > NODE_INFO_MAX_LENGTH) {

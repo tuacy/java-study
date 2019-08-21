@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class SqlUnionKeyLockTest {
+public class DbDistributedUnionKeyLockTest {
 
     private IDbDistributedLock dbDistributedLock;
 

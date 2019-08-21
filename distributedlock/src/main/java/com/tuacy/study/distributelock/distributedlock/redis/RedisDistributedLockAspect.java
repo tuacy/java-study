@@ -36,7 +36,7 @@ public class RedisDistributedLockAspect {
     @Autowired
     private IRedisDistributedLock distributedLock;
 
-    @Pointcut("@annotation(com.tuacy.study.distributelock.distributedlock.redis.RedisLock)")
+    @Pointcut("@annotation(com.tuacy.study.distributelock.distributedlock.redis.RedisDistributedLock)")
     private void lockPoint() {
 
     }
@@ -44,14 +44,14 @@ public class RedisDistributedLockAspect {
     @Around("lockPoint()")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
         Method method = ((MethodSignature) pjp.getSignature()).getMethod();
-        RedisLock redisLock = method.getAnnotation(RedisLock.class);
-        String key = redisLock.key();
+        RedisDistributedLock redisDistributedLock = method.getAnnotation(RedisDistributedLock.class);
+        String key = redisDistributedLock.key();
         if (StringUtils.isEmpty(key)) {
             Object[] args = pjp.getArgs();
             key = Arrays.toString(args);
         }
-        int retryTimes = redisLock.action().equals(LockFailAction.CONTINUE) ? redisLock.retryTimes() : 0;
-        boolean lock = distributedLock.lock(key, redisLock.keepMills(), retryTimes, redisLock.sleepMills());
+        int retryTimes = redisDistributedLock.action().equals(LockFailAction.CONTINUE) ? redisDistributedLock.retryTimes() : 0;
+        boolean lock = distributedLock.lock(key, redisDistributedLock.keepMills(), retryTimes, redisDistributedLock.sleepMills());
         if (!lock) {
             logger.debug("get lock failed : " + key);
             return null;

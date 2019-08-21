@@ -1,7 +1,7 @@
-package com.tuacy.study.distributelock.distributedlock.db;
+package com.tuacy.study.distributelock.distributedlock.zookeeper;
 
-import com.tuacy.study.distributelock.config.DbDistributedLockConfiguration;
-import com.tuacy.study.distributelock.distributedlock.LockFailAction;
+import com.tuacy.study.distributelock.config.ZookeeperLockConfiguration;
+import com.tuacy.study.distributelock.distributedlock.db.IDbDistributedLock;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @name: DistributedLockAspectConfiguration
@@ -28,19 +29,19 @@ import java.util.Arrays;
 @Aspect
 @Configuration
 @ConditionalOnClass(IDbDistributedLock.class)
-@AutoConfigureAfter(DbDistributedLockConfiguration.class)
-public class DbDistributedLockAspect {
+@AutoConfigureAfter(ZookeeperLockConfiguration.class)
+public class ZookeeperDistributedLockAspect {
 
-    private final Logger logger = LoggerFactory.getLogger(DbDistributedLockAspect.class);
+    private final Logger logger = LoggerFactory.getLogger(ZookeeperDistributedLockAspect.class);
 
-    private IDbDistributedLock dbDistributedLock;
+    private IZookeeperDistributedLock zookeeperLock;
 
     @Autowired
-    public void setDbDistributedLock(IDbDistributedLock dbDistributedLock) {
-        this.dbDistributedLock = dbDistributedLock;
+    public void setZookeeperLock(IZookeeperDistributedLock zookeeperLock) {
+        this.zookeeperLock = zookeeperLock;
     }
 
-    @Pointcut("@annotation(com.tuacy.study.distributelock.distributedlock.db.DbDistributedLock)")
+    @Pointcut("@annotation(com.tuacy.study.distributelock.distributedlock.zookeeper.ZookeeperDistributedLock)")
     private void lockPoint() {
 
     }
@@ -48,15 +49,20 @@ public class DbDistributedLockAspect {
     @Around("lockPoint()")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
         Method method = ((MethodSignature) pjp.getSignature()).getMethod();
-        DbDistributedLock dbDistributedLockAnnotation = method.getAnnotation(DbDistributedLock.class);
-        String key = dbDistributedLockAnnotation.key();
+        ZookeeperDistributedLock lockAnnotation = method.getAnnotation(ZookeeperDistributedLock.class);
+        String key = lockAnnotation.key();
         if (StringUtils.isEmpty(key)) {
             Object[] args = pjp.getArgs();
             key = Arrays.toString(args);
         }
-        int retryTimes = dbDistributedLockAnnotation.action().equals(LockFailAction.CONTINUE) ? dbDistributedLockAnnotation.retryTimes() : 0;
-        boolean lock = dbDistributedLock.lock(key, retryTimes, dbDistributedLockAnnotation.sleepMills());
-        if (!lock) {
+        long timeOut = lockAnnotation.timeout();
+        boolean lockFlag;
+        if (timeOut <= 0) {
+            lockFlag = zookeeperLock.lock(key);
+        } else {
+            lockFlag = zookeeperLock.lock(key, timeOut, TimeUnit.MILLISECONDS);
+        }
+        if (!lockFlag) {
             logger.debug("get lock failed : " + key);
             return null;
         }
@@ -68,7 +74,7 @@ public class DbDistributedLockAspect {
         } catch (Exception e) {
             logger.error("execute locked method occured an exception", e);
         } finally {
-            dbDistributedLock.unlock(key);
+            zookeeperLock.unlock(key);
             logger.debug("release lock");
         }
         return null;

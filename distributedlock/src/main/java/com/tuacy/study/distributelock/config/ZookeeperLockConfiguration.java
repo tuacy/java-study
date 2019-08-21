@@ -1,8 +1,9 @@
 package com.tuacy.study.distributelock.config;
 
-import com.tuacy.study.distributelock.distributedlock.zookeeper.IZookeeperLock;
-import com.tuacy.study.distributelock.distributedlock.zookeeper.ZookeeperLock;
+import com.tuacy.study.distributelock.distributedlock.zookeeper.IZookeeperDistributedLock;
+import com.tuacy.study.distributelock.distributedlock.zookeeper.ZookeeperDistributedLockImpl;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,8 +19,9 @@ import org.springframework.context.annotation.Configuration;
 public class ZookeeperLockConfiguration {
 
     @Bean
-    public IZookeeperLock zookeeperLock(ZkClient zkClient) {
-        return new ZookeeperLock(zkClient);
+    @ConditionalOnBean(ZkClient.class)
+    public IZookeeperDistributedLock zookeeperLock(ZkClient zkClient) {
+        return new ZookeeperDistributedLockImpl(zkClient);
     }
 
 }

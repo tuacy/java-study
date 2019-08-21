@@ -10,7 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @name: RedisDistributedLockTest
+ * @name: RedisDistributedLockImplTest
  * @author: tuacy.
  * @date: 2019/8/6.
  * @version: 1.0
@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  */
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class RedisDistributedLockTest {
+public class RedisDistributedLockImplTest {
 
     @Autowired
     private IRedisDistributedLock redisDistributedLock;
