@@ -1,4 +1,4 @@
-package com.tuacy.study.springboot;
+package com.tuacy.study.springboot.hook;
 
 import com.google.common.base.Preconditions;
 import org.springframework.context.ApplicationContext;
