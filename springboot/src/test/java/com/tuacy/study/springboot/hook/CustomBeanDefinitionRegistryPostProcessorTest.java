@@ -1,6 +1,6 @@
 package com.tuacy.study.springboot.hook;
 
-import com.tuacy.study.springboot.entity.CustomBean;
+import com.tuacy.study.springboot.hook.beandefinitionregisttypostprocessor.CustomBean;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

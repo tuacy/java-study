@@ -1,4 +1,4 @@
-package com.tuacy.study.springboot.entity;
+package com.tuacy.study.springboot.hook.beandefinitionregisttypostprocessor;
 
 /**
  * @name: CustomBean

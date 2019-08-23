@@ -1,6 +1,5 @@
-package com.tuacy.study.springboot.hook;
+package com.tuacy.study.springboot.hook.beandefinitionregisttypostprocessor;
 
-import com.tuacy.study.springboot.entity.CustomBean;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
