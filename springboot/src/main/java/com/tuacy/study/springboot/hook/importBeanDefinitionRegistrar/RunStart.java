@@ -1,5 +1,6 @@
-package com.tuacy.study.springboot.scanrunstart;
+package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar;
 
+import com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.RunStartScannerRegister;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;

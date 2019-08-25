@@ -1,4 +1,4 @@
-package com.tuacy.study.springboot.scanrunstart;
+package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar;
 
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;

@@ -45,25 +45,38 @@ public class CustomBeanPostProcessor implements BeanPostProcessor {
         Class clazz = bean.getClass();
         Field[] fields = clazz.getDeclaredFields();
         for (Field f : fields) {
+            // 找到对象里面添加了RoutingInjected注解的属性
             if (f.isAnnotationPresent(RoutingInjected.class)) {
+                // 一定要是接口
                 if (!f.getType().isInterface()) {
                     throw new BeanCreationException("RoutingInjected field must be declared as an interface: " + f.getName() + " @Class" + clazz.getName());
+                }
+                try {
+                    handleRoutingInjected(f, bean, f.getType());
+                } catch (IllegalAccessException e) {
+                    throw new BeanCreationException("Exception thrown when handleAutowireRouting", e);
                 }
             }
         }
         return bean;
     }
 
+
+    @SuppressWarnings("unchecked")
     private void handleRoutingInjected(Field field, Object bean, Class type) throws IllegalAccessException {
+        // 获取type的所有的bean
         Map<String, Object> candidates = this.applicationContext.getBeansOfType(type);
+        if (candidates.isEmpty()) {
+            throw new IllegalAccessException(type.getSimpleName() + " 没有实现类");
+        }
         field.setAccessible(true);
         if (candidates.size() == 1) {
+            // 如果type只有一个bean,那么直接设置就好了
             field.set(bean, candidates.values().iterator().next());
-        } else if (candidates.size() == 2) {
-            Object proxy = RountingBeanProxyFactory.crateProxy(type, candidates);
-            field.set(bean, proxy);
         } else {
-            throw new IllegalAccessException("Find more than 2 beans for type:" + type);
+            // 如果有多个实现类,我们就需要看用那个来代理执行了
+            Object proxy = RoutingBeanProxyFactory.crateProxy(type, candidates);
+            field.set(bean, proxy);
         }
     }
 }

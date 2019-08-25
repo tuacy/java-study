@@ -17,6 +17,6 @@ public @interface RoutingSwitch {
     /**
      * 在配置系统中开关的属性名称，应用系统将会实时读取配置系统中对应的开关的值来决定调用哪个版本
      */
-    String value() default "";
+    Class switchClass();
 
 }
