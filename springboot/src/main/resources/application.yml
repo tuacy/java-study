@@ -3,3 +3,9 @@ server:
 spring:
   application:
     name: study-springboot
+
+# 自定义的一些属性
+user:
+  info:
+    name: tuacy
+    age: 27
