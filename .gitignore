@@ -25,3 +25,7 @@ springboot/target
 # license
 license/license.iml
 license/target
+
+# tableshard
+tableshard/tableshard.iml
+tableshard/target
