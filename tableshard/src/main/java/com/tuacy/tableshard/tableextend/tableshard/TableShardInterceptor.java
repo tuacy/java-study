@@ -186,14 +186,12 @@ public class TableShardInterceptor implements Interceptor {
         }
 
         TableShardParam annotation = parameter.getAnnotation(TableShardParam.class);
-        TableShardParam.EParamType paramType = annotation.paramType();
-        if (paramType.equals(TableShardParam.EParamType.PRIMITIVE)) {
+        String dependFileName = annotation.dependFieldName();
+        if (StringUtils.isEmpty(dependFileName)) {
             return getPrimitiveParamFieldValue(metaStatementHandler, parameter.getName());
-        } else if (paramType.equals(TableShardParam.EParamType.OBJECT)) {
+        } else {
             return getParamObjectFiledValue(metaStatementHandler, parameter.getType(), annotation.dependFieldName());
         }
-
-        return null;
     }
 
     /**
