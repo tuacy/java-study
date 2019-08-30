@@ -46,8 +46,9 @@ public class TableShardInterceptor implements Interceptor {
 
     /**
      * sql语句里面去获取表名的依据（主要，全部是小写的）
+     * 说白了就是哪些字符串后面会跟上表名
      */
-    private final static String[] SQL_TABLE_NAME_FLAG_PREFIX = {"from ", "join ", "update ", "insert into "};
+    private final static String[] SQL_TABLE_NAME_FLAG_PREFIX = {"from ", "from\n", "join ", "join\n", "update ", "update\n", "insert into ", "insert into\n"};
 
     private static final ObjectFactory DEFAULT_OBJECT_FACTORY = new DefaultObjectFactory();
     private static final ObjectWrapperFactory DEFAULT_OBJECT_WRAPPER_FACTORY = new DefaultObjectWrapperFactory();
@@ -72,23 +73,23 @@ public class TableShardInterceptor implements Interceptor {
 
             MappedStatement mappedStatement = (MappedStatement) metaStatementHandler.getValue("delegate.mappedStatement");
             // 判断方法上是否添加了 TableShardAnnotation 注解，因为只有添加了TableShard注解的方法我们才会去做分表处理
-            TablePrepareHandler tablePrepareHandler = getTableShardAnnotation(mappedStatement);
+            TablePrepare tablePrepare = getTableShardAnnotation(mappedStatement);
 
-            // 没有加@TablePrepareHandler注解则退出
-            if (tablePrepareHandler == null) {
+            // 没有加@TTablePrepare注解则不填家我们自定义的逻辑
+            if (tablePrepare == null) {
                 return invocation.proceed();
             }
 
-            boolean enableAutoCreateTable = tablePrepareHandler.enableAutoCreateTable();
-            boolean enableTableShard = tablePrepareHandler.enableTableShard();
+            boolean enableAutoCreateTable = tablePrepare.enableAutoCreateTable(); // 表不存在的是哈,事发创建
+            boolean enableTableShard = tablePrepare.enableTableShard(); // 事发进行分表逻辑处理
             // 自动建表和分表是否开启，都没有则退出往下走
             if (!enableAutoCreateTable && !enableTableShard) {
                 invocation.proceed();
             }
 
-            String[] appointTable = tablePrepareHandler.appointTable();
+            String[] appointTable = tablePrepare.appointTable();
             if (appointTable.length == 0) {
-                List<String> tableNameList = getTableNamesBySql(originSql);
+                List<String> tableNameList = getTableNamesFromSql(originSql);
                 if (tableNameList == null || tableNameList.isEmpty()) {
                     return invocation.proceed();
                 } else {
@@ -106,19 +107,19 @@ public class TableShardInterceptor implements Interceptor {
 
 
             // 获取分表表名处理策略
-            Class<? extends ITableNameStrategy> strategyClass = tablePrepareHandler.strategy();
+            Class<? extends ITableNameStrategy> strategyClass = tablePrepare.strategy();
             ITableNameStrategy tableStrategy = null;
             if (!strategyClass.equals(TableNameStrategyVoid.class)) {
                 tableStrategy = strategyClass.newInstance();
             }
 
-            String dependValue = getDependFieldValue(tablePrepareHandler, metaStatementHandler, mappedStatement);
+            String dependValue = getDependFieldValue(tablePrepare, metaStatementHandler, mappedStatement);
 
             // 启用自动建表
-            if (tablePrepareHandler.enableAutoCreateTable()) {
+            if (tablePrepare.enableAutoCreateTable()) {
                 SqlSessionTemplate template = SpringContextHolder.getBean(SqlSessionTemplate.class);
                 for (String tableName : appointTable) {
-                    TableAutoCreateConfig classConfig = TableCreateManager.INSTANCE.getClassConfig(tableName);
+                    TableCreateConfig classConfig = TableCreateManager.INSTANCE.getClassConfig(tableName);
                     if (classConfig == null) {
                         // 没有找到建表语句则跳过
                         continue;
@@ -131,7 +132,9 @@ public class TableShardInterceptor implements Interceptor {
                         continue;
                     }
 
-                    sql = sql.replace(tableName + "@{suffix}", dependValue == null ? "" : strategyClass == TableNameStrategyVoid.class ? dependValue : tableStrategy.tableName(tableName, dependValue));
+                    if (!StringUtils.isEmpty(dependValue) && strategyClass != TableNameStrategyVoid.class) {
+                        sql = sql.replace(tableName, tableStrategy.tableName(tableName, dependValue));
+                    }
 
                     Connection conn = (Connection) invocation.getArgs()[0];
                     boolean preAutoCommitState = conn.getAutoCommit();
@@ -152,7 +155,7 @@ public class TableShardInterceptor implements Interceptor {
 
             // 启用分表
             if (strategyClass != TableNameStrategyVoid.class) {
-                if (tablePrepareHandler.enableTableShard()) {
+                if (tablePrepare.enableTableShard()) {
                     String updateSql = originSql;
                     for (String tableName : appointTable) {
                         // 策略处理表名
@@ -176,7 +179,7 @@ public class TableShardInterceptor implements Interceptor {
     /**
      * 从参数里面找到指定对象指定字段对应的值
      */
-    private String getDependFieldValue(TablePrepareHandler tablePrepareHandler, MetaObject metaStatementHandler, MappedStatement mappedStatement) throws Exception {
+    private String getDependFieldValue(TablePrepare tablePrepare, MetaObject metaStatementHandler, MappedStatement mappedStatement) throws Exception {
 
         // 以上情况下不满足则走@TableShardParam机制
         String id = mappedStatement.getId();
@@ -185,7 +188,7 @@ public class TableShardInterceptor implements Interceptor {
         Method[] methods = Class.forName(className).getMethods();
         Method method = null;
         for (Method me : methods) {
-            if (me.getName().equals(methodName) && me.isAnnotationPresent(tablePrepareHandler.annotationType())) {
+            if (me.getName().equals(methodName) && me.isAnnotationPresent(tablePrepare.annotationType())) {
                 method = me;
             }
         }
@@ -222,18 +225,19 @@ public class TableShardInterceptor implements Interceptor {
 
         String tableSharedFieldParamKey = parameter.getAnnotation(Param.class).value();
         TableShardParam annotation = parameter.getAnnotation(TableShardParam.class);
-        Class<?> parameterType = parameter.getType();
-        if (isPrimitive(parameterType) || StringUtils.isEmpty(annotation.value())) {
+        Class<?> parameterType = parameter.getType(); // 参数的类型
+        String dependFieldName = StringUtils.isEmpty(annotation.value()) ? annotation.dependFieldName() : annotation.value();
+        if (isPrimitive(parameterType) || StringUtils.isEmpty(dependFieldName)) {
             return getPrimitiveParamFieldValue(metaStatementHandler, tableSharedFieldParamKey);
         } else {
-            return getParamObjectFiledValue(metaStatementHandler, tableSharedFieldParamKey, annotation.value());
+            return getParamObjectFiledValue(metaStatementHandler, tableSharedFieldParamKey, dependFieldName);
         }
     }
 
     /**
      * 判断是否是基础类型 9大基础类型及其包装类
      *
-     * @return 是否是基础类型
+     * @return 是否是基础类型, long, int, Long 等等
      */
     private boolean isPrimitive(Class<?> clazz) {
         if (clazz.isPrimitive()) {
@@ -252,12 +256,12 @@ public class TableShardInterceptor implements Interceptor {
     }
 
     /**
-     * 解析sql获取表名
+     * 解析sql获取到sql里面所有的表名
      *
      * @param sql sql
      * @return 表名列表
      */
-    private List<String> getTableNamesBySql(String sql) {
+    private List<String> getTableNamesFromSql(String sql) {
         List<String> tableNameList = Lists.newArrayList();
 
         for (String item : SQL_TABLE_NAME_FLAG_PREFIX) {
@@ -281,23 +285,23 @@ public class TableShardInterceptor implements Interceptor {
      * @param mappedStatement MappedStatement
      * @return TableShard注解
      */
-    private TablePrepareHandler getTableShardAnnotation(MappedStatement mappedStatement) {
-        TablePrepareHandler tablePrepareHandler = null;
+    private TablePrepare getTableShardAnnotation(MappedStatement mappedStatement) {
+        TablePrepare tablePrepare = null;
         try {
             String id = mappedStatement.getId();
             String className = id.substring(0, id.lastIndexOf("."));
             String methodName = id.substring(id.lastIndexOf(".") + 1);
             final Method[] method = Class.forName(className).getMethods();
             for (Method me : method) {
-                if (me.getName().equals(methodName) && me.isAnnotationPresent(TablePrepareHandler.class)) {
-                    tablePrepareHandler = me.getAnnotation(TablePrepareHandler.class);
+                if (me.getName().equals(methodName) && me.isAnnotationPresent(TablePrepare.class)) {
+                    tablePrepare = me.getAnnotation(TablePrepare.class);
                     break;
                 }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return tablePrepareHandler;
+        return tablePrepare;
     }
 
     /**

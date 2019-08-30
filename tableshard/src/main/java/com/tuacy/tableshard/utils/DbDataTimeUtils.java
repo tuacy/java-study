@@ -3,13 +3,13 @@ package com.tuacy.tableshard.utils;
 import java.time.LocalDateTime;
 
 /**
- * @name: Tests
+ * @name: DbDataTimeUtils
  * @author: tuacy.
  * @date: 2019/8/30.
  * @version: 1.0
  * @Description:
  */
-public class Tests {
+public class DbDataTimeUtils {
 
     /**
      * 日期类型转换为包含“年/月/日/时/分/秒/毫秒”的long型数据。

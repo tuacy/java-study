@@ -3,7 +3,7 @@ package com.tuacy.tableshard.tableextend.tableshard;
 import java.lang.annotation.*;
 
 /**
- * @name: TablePrepareHandler
+ * @name: TablePrepare
  * @author: tuacy.
  * @date: 2019/8/29.
  * @version: 1.0
@@ -13,12 +13,12 @@ import java.lang.annotation.*;
 @Inherited
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TablePrepareHandler {
+public @interface TablePrepare {
 
     /**
-     * 启用自动建表
+     * 启用自动建表,当表不存在的时候,是否创建表
      */
-    boolean enableAutoCreateTable() default false;
+    boolean enableAutoCreateTable() default true;
 
     /**
      * 启用分表
@@ -32,7 +32,6 @@ public @interface TablePrepareHandler {
 
     /**
      * 表名策略，通过某种规则得到表名
-     * 如果此处为空，需要再去判断是否使用了TableShardParam这个注解
      */
     Class<? extends ITableNameStrategy> strategy() default TableNameStrategyVoid.class;
 }

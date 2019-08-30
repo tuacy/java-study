@@ -4,15 +4,16 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * @name: TableAutoCreateConfig
+ * @name: TableCreateConfig
  * @author: tuacy.
  * @date: 2019/8/29.
  * @version: 1.0
- * @Description: 自动建表相关的一些配置
+ * @Description: 自动建表相关的一些配置信息
+ * 在拦截器里面我们会根据autoCreateTableMapperClass类的autoCreateTableMapperMethodName方法找到建表语句
  */
 @Data
 @Accessors(chain = true)
-public class TableAutoCreateConfig {
+public class TableCreateConfig {
 
     /**
      * 表名

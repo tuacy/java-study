@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuacy.tableshard.mapper.AccHourMapper">
+
+    <!-- 基础表名 StatisAccHour -->
+
+    <!-- 往数据库里面插入一条记录 -->
+    <insert id="insertItem">
+
+        insert into StatisAccHour (
+            `recTime`,
+            `ptId`,
+            `value`
+        ) value (
+            #{item.recTime},
+            #{item.ptId},
+            #{item.value}
+        )
+
+    </insert>
+
+</mapper>

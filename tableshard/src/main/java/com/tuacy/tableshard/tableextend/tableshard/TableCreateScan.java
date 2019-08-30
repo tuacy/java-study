@@ -9,7 +9,8 @@ import java.lang.annotation.*;
  * @author: tuacy.
  * @date: 2019/8/30.
  * @version: 1.0
- * @Description:
+ * @Description: TableCreateScan注解用于标识, 表model对应的包名
+ * 我们去去这个包里面查找所有带有TableCreate注解的类,保存建表对应的信息
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

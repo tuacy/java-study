@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuacy.tableshard.mapper.CreateTableMapper">
+
+    <!-- acc 天表, 一天一张表 -->
+    <update id="createAccDay">
+        CREATE TABLE IF NOT EXISTS `StatisAccDay` (
+            `recTime` bigint(20) NOT NULL,
+            `ptId` int(11) NOT NULL,
+            `value` double DEFAULT NULL,
+            PRIMARY KEY (`RecTime`,`PtId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    </update>
+
+    <!-- acc 小时表, 一个小时一张表 -->
+    <update id="createAccHour">
+        CREATE TABLE IF NOT EXISTS `StatisAccHour` (
+            `recTime` bigint(20) NOT NULL,
+            `ptId` int(11) NOT NULL,
+            `value` double DEFAULT NULL,
+            PRIMARY KEY (`RecTime`,`PtId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    </update>
+
+    <!-- acc 月表, 一个月一张表 -->
+    <update id="createAccMonth">
+        CREATE TABLE IF NOT EXISTS `StatisAcc` (
+            `recTime` bigint(20) NOT NULL,
+            `ptId` int(11) NOT NULL,
+            `value` double DEFAULT NULL,
+            PRIMARY KEY (`RecTime`,`PtId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    </update>
+
+</mapper>

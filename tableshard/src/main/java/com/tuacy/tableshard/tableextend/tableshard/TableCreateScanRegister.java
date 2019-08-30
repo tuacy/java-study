@@ -10,7 +10,7 @@ import org.springframework.core.type.AnnotationMetadata;
  * @author: tuacy.
  * @date: 2019/8/30.
  * @version: 1.0
- * @Description:
+ * @Description: 配合TableCreateScan注解使用,找到所有添加了TableCreate注解的类,保存建表对应的信息,保存在TableCreateManager下面
  */
 public class TableCreateScanRegister implements ImportBeanDefinitionRegistrar {
 
@@ -25,7 +25,7 @@ public class TableCreateScanRegister implements ImportBeanDefinitionRegistrar {
         }
 
         String[] basePackages = (String[]) annoAttrs.get(PACKAGE_NAME_KEY);
-        TableCreateManager.INSTANCE.init(basePackages);
+        TableCreateManager.INSTANCE.startInit(basePackages);
     }
 
 }
