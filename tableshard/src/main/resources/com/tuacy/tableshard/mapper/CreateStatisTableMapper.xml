@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tuacy.tableshard.mapper.CreateStatisTableMapper">
+
+    <update id="createSta2AccDay">
+        CREATE TABLE IF NOT EXISTS `IO_Sta2AccDay@{suffix}` (
+            `RecTime` bigint(20) NOT NULL,
+            `PtId` int(11) NOT NULL,
+            `IncrValue` double DEFAULT NULL,
+            `Value` double DEFAULT NULL,
+            `ValueValid` bit(1) NOT NULL,
+            PRIMARY KEY (`RecTime`,`PtId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    </update>
+
+    <update id="createSta2AccHour">
+        CREATE TABLE IF NOT EXISTS `IO_Sta2AccHour@{suffix}` (
+            `RecTime` bigint(20) NOT NULL,
+            `PtId` int(11) NOT NULL,
+            `IncrValue` double DEFAULT NULL,
+            `Value` double DEFAULT NULL,
+            `ValueValid` bit(1) NOT NULL,
+            PRIMARY KEY (`RecTime`,`PtId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    </update>
+
+    <update id="createSta2AccMonth">
+        CREATE TABLE IF NOT EXISTS `IO_Sta2Acc@{suffix}` (
+            `RecTime` bigint(20) NOT NULL,
+            `PtId` int(11) NOT NULL,
+            `IncrValue` double DEFAULT NULL,
+            `Value` double DEFAULT NULL,
+            `ValueValid` bit(1) NOT NULL,
+            PRIMARY KEY (`RecTime`,`PtId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    </update>
+
+    <update id="createSta2AccZeroLog">
+
+    </update>
+
+    <update id="createSta2AiMaxDay">
+        CREATE TABLE IF NOT EXISTS `IO_Sta2AiMaxDay@{suffix}` (
+            `RecTime` bigint(20) NOT NULL,
+            `PtId` int(11) NOT NULL,
+            `MaxValue` double DEFAULT NULL,
+            `MaxValueTime` bigint(20) DEFAULT NULL,
+            `MinValue` double DEFAULT NULL,
+            `MinValueTime` bigint(20) DEFAULT NULL,
+            `AverageValue` double DEFAULT NULL,
+            `Value` double DEFAULT NULL,
+            `ValueValid` bit(1) NOT NULL,
+            PRIMARY KEY (`RecTime`,`PtId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    </update>
+
+    <update id="createSta2AiMaxHour">
+        CREATE TABLE IF NOT EXISTS `IO_Sta2AiMaxHour@{suffix}` (
+            `RecTime` bigint(20) NOT NULL,
+            `PtId` int(11) NOT NULL,
+            `MaxValue` double DEFAULT NULL,
+            `MaxValueTime` bigint(20) DEFAULT NULL,
+            `MinValue` double DEFAULT NULL,
+            `MinValueTime` bigint(20) DEFAULT NULL,
+            `AverageValue` double DEFAULT NULL,
+            `Value` double DEFAULT NULL,
+            `ValueValid` bit(1) NOT NULL,
+            PRIMARY KEY (`RecTime`,`PtId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    </update>
+
+    <update id="createSta2AiMaxMonth">
+        CREATE TABLE IF NOT EXISTS `IO_Sta2AiMaxMonth@{suffix}` (
+            `RecTime` bigint(20) NOT NULL,
+            `PtId` int(11) NOT NULL,
+            `MaxValue` double DEFAULT NULL,
+            `MaxValueTime` bigint(20) DEFAULT NULL,
+            `MinValue` double DEFAULT NULL,
+            `MinValueTime` bigint(20) DEFAULT NULL,
+            `AverageValue` double DEFAULT NULL,
+            `Value` double DEFAULT NULL,
+            `ValueValid` bit(1) NOT NULL,
+            PRIMARY KEY (`RecTime`,`PtId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    </update>
+
+    <update id="createSta2QualAiDay">
+        CREATE TABLE IF NOT EXISTS `IO_Sta2QualAiDay@{suffix}` (
+            `RecTime` bigint(20) NOT NULL,
+            `PtId` int(11) NOT NULL,
+            `QualitySeconds_Normal` int(11) NOT NULL,
+            `QualitySeconds_Hi` int(11) NOT NULL,
+            `QualitySeconds_HiHi` int(11) NOT NULL,
+            `QualitySeconds_Lo` int(11) NOT NULL,
+            `QualitySeconds_LoLo` int(11) NOT NULL,
+            `QualitySeconds_Invalid` int(11) NOT NULL,
+            `QualityCount_Hi` int(11) NOT NULL,
+            `QualityCount_HiHi` int(11) NOT NULL,
+            `QualityCount_Lo` int(11) NOT NULL,
+            `QualityCount_LoLo` int(11) NOT NULL,
+            PRIMARY KEY (`RecTime`,`PtId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    </update>
+
+    <update id="createSta2QualAiMonth">
+        CREATE TABLE IF NOT EXISTS `IO_Sta2QualAiMonth@{suffix}` (
+            `RecTime` bigint(20) NOT NULL,
+            `PtId` int(11) NOT NULL,
+            `QualitySeconds_Normal` int(11) NOT NULL,
+            `QualitySeconds_Hi` int(11) NOT NULL,
+            `QualitySeconds_HiHi` int(11) NOT NULL,
+            `QualitySeconds_Lo` int(11) NOT NULL,
+            `QualitySeconds_LoLo` int(11) NOT NULL,
+            `QualitySeconds_Invalid` int(11) NOT NULL,
+            `QualityCount_Hi` int(11) NOT NULL,
+            `QualityCount_HiHi` int(11) NOT NULL,
+            `QualityCount_Lo` int(11) NOT NULL,
+            `QualityCount_LoLo` int(11) NOT NULL,
+            PRIMARY KEY (`RecTime`,`PtId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    </update>
+
+    <update id="createSta2QualCommDay">
+        CREATE TABLE IF NOT EXISTS `IO_Sta2QualCommDay@{suffix}` (
+            `RecTime` bigint(20) NOT NULL,
+            `PtId` int(11) NOT NULL,
+            `QualitySeconds_Unkown` int(11) NOT NULL,
+            `QualitySeconds_Normal` int(11) NOT NULL,
+            `QualitySeconds_Interrupt` int(11) NOT NULL,
+            `QualityCount_Interrupt` int(11) NOT NULL,
+            PRIMARY KEY (`RecTime`,`PtId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    </update>
+
+    <update id="createSta2QualCommMonth">
+        CREATE TABLE IF NOT EXISTS `IO_Sta2QualCommMonth@{suffix}` (
+            `RecTime` bigint(20) NOT NULL,
+            `PtId` int(11) NOT NULL,
+            `QualitySeconds_Unkown` int(11) NOT NULL,
+            `QualitySeconds_Normal` int(11) NOT NULL,
+            `QualitySeconds_Interrupt` int(11) NOT NULL,
+            `QualityCount_Interrupt` int(11) NOT NULL,
+            PRIMARY KEY (`RecTime`,`PtId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    </update>
+
+    <update id="createSta2QualDiDay">
+        CREATE TABLE IF NOT EXISTS `IO_Sta2QualDiDay@{suffix}` (
+            `RecTime` bigint(20) NOT NULL,
+            `PtId` int(11) NOT NULL,
+            `QualitySeconds_1` int(11) NOT NULL,
+            `QualitySeconds_0` int(11) NOT NULL,
+            `QualitySeconds_Invalid` int(11) NOT NULL,
+            `QualityCount_1to0` int(11) NOT NULL,
+            `QualityCount_0to1` int(11) NOT NULL,
+            PRIMARY KEY (`RecTime`,`PtId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    </update>
+
+    <update id="createSta2QualDiMonth">
+        CREATE TABLE IF NOT EXISTS `IO_Sta2QualDiMonth@{suffix}` (
+            `RecTime` bigint(20) NOT NULL,
+            `PtId` int(11) NOT NULL,
+            `QualitySeconds_1` int(11) NOT NULL,
+            `QualitySeconds_0` int(11) NOT NULL,
+            `QualitySeconds_Invalid` int(11) NOT NULL,
+            `QualityCount_1to0` int(11) NOT NULL,
+            `QualityCount_0to1` int(11) NOT NULL,
+            PRIMARY KEY (`RecTime`,`PtId`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    </update>
+
+</mapper>

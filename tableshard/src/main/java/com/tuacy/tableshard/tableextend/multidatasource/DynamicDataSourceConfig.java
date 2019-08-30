@@ -17,7 +17,6 @@ import java.util.Map;
  * @Description: 数据源配置管理
  */
 
-//@Configuration
 public class DynamicDataSourceConfig {
 
     /**
