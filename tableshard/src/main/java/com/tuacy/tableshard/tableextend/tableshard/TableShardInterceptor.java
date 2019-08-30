@@ -171,8 +171,10 @@ public class TableShardInterceptor implements Interceptor {
         int flag = 0;
         Parameter parameter = null;
         for (Parameter p : parameters) {
-            parameter = p;
-            flag += p.getAnnotation(TableShardParam.class) == null ? 0 : 1;
+            if (p.getAnnotation(TableShardParam.class) != null) {
+                parameter = p;
+                flag++;
+            }
         }
 
         // 参数没有注解则退出

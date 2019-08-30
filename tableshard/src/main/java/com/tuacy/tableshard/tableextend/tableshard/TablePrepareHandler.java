@@ -31,18 +31,6 @@ public @interface TablePrepareHandler {
     String[] appointTable() default {};
 
     /**
-     * 从参数的那个对象获取到我们需要的表名依据，如果没有传递则表的名字直接是tableBaseName对应的名字
-     * 如果此处为空，需要再去判断是否使用了TableShardParam这个注解
-     */
-    Class<?> dependClassType() default void.class;
-
-    /**
-     * dependClassType，dependFieldName取到我们需要的获取表名的依据
-     * 如果此处为空，需要再去判断是否使用了TableShardParam这个注解
-     */
-    String dependFieldName() default "";
-
-    /**
      * 表名策略，通过某种规则得到表名
      * 如果此处为空，需要再去判断是否使用了TableShardParam这个注解
      */
