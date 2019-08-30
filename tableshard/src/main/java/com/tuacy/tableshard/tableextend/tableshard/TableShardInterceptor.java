@@ -1,16 +1,8 @@
 package com.tuacy.tableshard.tableextend.tableshard;
 
-import com.pilot.ioserver.basic.biz.pbl.annotation.tableshard.TablePrepareHandler;
-import com.pilot.ioserver.basic.biz.pbl.annotation.tableshard.TableShardParam;
-import com.pilot.ioserver.basic.biz.pbl.config.tableextend.ITableNameStrategy;
-import com.pilot.ioserver.basic.biz.pbl.config.tableextend.TableNameStrategyVoid;
-import com.pilot.ioserver.basic.biz.pbl.entity.common.DBModelTableShardConfig;
-import com.pilot.ioserver.basic.biz.pbl.enums.EParamType;
-import com.pilot.ioserver.basic.biz.pbl.internal.dbmodel.DBModelManager;
-import com.pilot.ioserver.basic.biz.pbl.utils.SpringContextHolder;
-import com.pilot.ioserver.basic.pbl.exception.BaseRuntionException;
-import com.pilot.ioserver.basic.pbl.utils.CollectionUtil;
-import com.pilot.ioserver.basic.pbl.utils.ReflectUtil;
+import com.google.common.collect.Lists;
+import com.tuacy.tableshard.hook.SpringContextHolder;
+import com.tuacy.tableshard.utils.ReflectUtil;
 import org.apache.ibatis.binding.MapperMethod;
 import org.apache.ibatis.executor.statement.RoutingStatementHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
@@ -25,8 +17,6 @@ import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.wrapper.DefaultObjectWrapperFactory;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 import org.mybatis.spring.SqlSessionTemplate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
@@ -51,8 +41,6 @@ import java.util.*;
         )
 })
 public class TableShardInterceptor implements Interceptor {
-
-    private static Logger logger = LoggerFactory.getLogger(TableShardInterceptor.class);
 
     /**
      * sql中from标识（小写）
@@ -84,7 +72,7 @@ public class TableShardInterceptor implements Interceptor {
                     if (tablePrepareHandler != null) {
                         boolean enableAutoCreateTable = tablePrepareHandler.enableAutoCreateTable();
                         boolean enableTableShard = tablePrepareHandler.enableTableShard();
-                        if(!enableAutoCreateTable && !enableTableShard){
+                        if (!enableAutoCreateTable && !enableTableShard) {
                             invocation.proceed();
                         }
 
@@ -93,9 +81,9 @@ public class TableShardInterceptor implements Interceptor {
                         String dependValue = getDependFieldValue(tablePrepareHandler, metaStatementHandler, mappedStatement);
 
                         String[] appointTable = tablePrepareHandler.appointTable();
-                        if(appointTable.length == 0){
+                        if (appointTable.length == 0) {
                             List<String> tableNameList = getTableNamesBySql(originSql);
-                            if(CollectionUtil.isEmpty(tableNameList)){
+                            if (tableNameList == null || tableNameList.isEmpty()) {
                                 return invocation.proceed();
                             } else {
                                 appointTable = new String[tableNameList.size()];
@@ -105,16 +93,16 @@ public class TableShardInterceptor implements Interceptor {
 
                         // 策略实例
                         ITableNameStrategy tableStrategy = null;
-                        if(!strategyClass.equals(TableNameStrategyVoid.class)){
+                        if (!strategyClass.equals(TableNameStrategyVoid.class)) {
                             tableStrategy = strategyClass.newInstance();
                         }
 
                         // 启用自动建表
-                        if(tablePrepareHandler.enableAutoCreateTable()){
+                        if (tablePrepareHandler.enableAutoCreateTable()) {
                             SqlSessionTemplate template = SpringContextHolder.getBean(SqlSessionTemplate.class);
                             for (String tableName : appointTable) {
-                                TableAutoCreateConfig classConfig = DBModelManager.INSTANCE.getClassConfig(tableName);
-                                if(classConfig == null){
+                                TableAutoCreateConfig classConfig = TableCreateManager.INSTANCE.getClassConfig(tableName);
+                                if (classConfig == null) {
                                     // 没有找到建表语句
                                     continue;
                                 }
@@ -126,20 +114,21 @@ public class TableShardInterceptor implements Interceptor {
                                 Connection conn = (Connection) invocation.getArgs()[0];
                                 conn.setAutoCommit(false);//将自动提交关闭
                                 try (PreparedStatement countStmt = conn.prepareStatement(sql)) {
-                                    ReflectUtil.setFieldValue(boundSql, "sql", sql);
+                                    // 把新语句设置回去
+                                    metaStatementHandler.setValue("delegate.boundSql.sql", sql);
                                     boolean isSuccess = countStmt.execute();
                                     conn.commit();//执行完后，手动提交事务
                                     conn.setAutoCommit(true);//在把自动提交打开
                                     System.out.println(isSuccess);
                                 } catch (Exception e) {
-                                    e.printStackTrace();;
+                                    e.printStackTrace();
                                 }
                             }
                         }
 
                         // 启用分表
                         if (strategyClass != TableNameStrategyVoid.class) {
-                            if(tablePrepareHandler.enableTableShard()) {
+                            if (tablePrepareHandler.enableTableShard()) {
                                 String updateSql = originSql;
                                 for (String tableName : appointTable) {
                                     // 策略处理表名
@@ -162,10 +151,6 @@ public class TableShardInterceptor implements Interceptor {
         return invocation.proceed();
     }
 
-    private void createTable(String sql, Connection connection, MappedStatement mappedStatement, BoundSql boundSql) throws SQLException {
-
-    }
-
     private String getDependFieldValue(TablePrepareHandler tablePrepareHandler, MetaObject metaStatementHandler, MappedStatement mappedStatement) throws Exception {
         String id = mappedStatement.getId();
         String className = id.substring(0, id.lastIndexOf("."));
@@ -179,7 +164,7 @@ public class TableShardInterceptor implements Interceptor {
         }
 
         Parameter[] parameters = method.getParameters();
-        if(parameters.length == 0){
+        if (parameters.length == 0) {
             return null;
         }
 
@@ -191,20 +176,20 @@ public class TableShardInterceptor implements Interceptor {
         }
 
         // 参数没有注解则退出
-        if(flag == 0){
+        if (flag == 0) {
             return null;
         }
 
         // 多个则抛异常
-        if(flag > 1){
-            throw new BaseRuntionException("存在多个指定@TableShardParam的参数，无法处理");
+        if (flag > 1) {
+            throw new RuntimeException("存在多个指定@TableShardParam的参数，无法处理");
         }
 
         TableShardParam annotation = parameter.getAnnotation(TableShardParam.class);
-        EParamType paramType = annotation.paramType();
-        if(paramType.equals(EParamType.PRIMITIVE)){
+        TableShardParam.EParamType paramType = annotation.paramType();
+        if (paramType.equals(TableShardParam.EParamType.PRIMITIVE)) {
             return getPrimitiveParamFieldValue(metaStatementHandler, parameter.getName());
-        } else if(paramType.equals(EParamType.OBJECT)) {
+        } else if (paramType.equals(TableShardParam.EParamType.OBJECT)) {
             return getParamObjectFiledValue(metaStatementHandler, parameter.getType(), annotation.dependFieldName());
         }
 
@@ -213,18 +198,19 @@ public class TableShardInterceptor implements Interceptor {
 
     /**
      * 解析sql获取表名
+     *
      * @param sql sql
      * @return 表名列表
      */
-    private List<String> getTableNamesBySql(String sql){
-        List<String> tableNameList = CollectionUtil.newArrayList();
+    private List<String> getTableNamesBySql(String sql) {
+        List<String> tableNameList = Lists.newArrayList();
 
         // from
         String sqlFromTemp = sql;
         int fromFlag = sqlFromTemp.toLowerCase().indexOf(SQL_FROM_FLAG_PREFIX);
         while (fromFlag != -1) {
             String afterSql = sqlFromTemp.substring(fromFlag + SQL_FROM_FLAG_PREFIX.length(), sql.length() - 1);
-            if(!afterSql.contains(" ")) {
+            if (!afterSql.contains(" ")) {
                 // 表示表在最后，例如select * from test,截取到最后是test，不包含空格
                 tableNameList.add(afterSql);
                 break;
@@ -240,7 +226,7 @@ public class TableShardInterceptor implements Interceptor {
         int joinFlag = sqlJoinTemp.toLowerCase().indexOf(SQL_JOIN_FLAG_PREFIX);
         while (joinFlag != -1) {
             String afterSql = sqlJoinTemp.substring(joinFlag + SQL_FROM_FLAG_PREFIX.length(), sql.length() - 1);
-            if(!afterSql.contains(" ")) {
+            if (!afterSql.contains(" ")) {
                 // 表示表在最后，例如select * from test,截取到最后是test，不包含空格
                 tableNameList.add(afterSql);
                 break;
@@ -255,6 +241,7 @@ public class TableShardInterceptor implements Interceptor {
 
     /**
      * 获取方法上的TableShard注解
+     *
      * @param mappedStatement MappedStatement
      * @return TableShard注解
      */
@@ -280,7 +267,7 @@ public class TableShardInterceptor implements Interceptor {
     /**
      * 从参数里面找到指定对象指定字段对应的值--基础类型
      */
-    private String getPrimitiveParamFieldValue(MetaObject metaStatementHandler, String dependFieldName){
+    private String getPrimitiveParamFieldValue(MetaObject metaStatementHandler, String dependFieldName) {
         BoundSql boundSql = (BoundSql) metaStatementHandler.getValue("delegate.boundSql");
         Object parameterObject = boundSql.getParameterObject();
         if (parameterObject == null) {
@@ -301,7 +288,7 @@ public class TableShardInterceptor implements Interceptor {
         }
         Object dependObject = null;
         try {
-            if(dependClass.equals(void.class)){
+            if (dependClass.equals(void.class)) {
                 if (dependFieldName == null || dependFieldName.equals("")) {
                     return String.valueOf(dependObject);
                 }
@@ -342,5 +329,6 @@ public class TableShardInterceptor implements Interceptor {
     }
 
     @Override
-    public void setProperties(Properties properties) { }
+    public void setProperties(Properties properties) {
+    }
 }

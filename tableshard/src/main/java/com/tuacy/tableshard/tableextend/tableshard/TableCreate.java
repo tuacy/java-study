@@ -3,7 +3,7 @@ package com.tuacy.tableshard.tableextend.tableshard;
 import java.lang.annotation.*;
 
 /**
- * @name: ATableAutoCreate
+ * @name: TableCreate
  * @author: tuacy.
  * @date: 2019/8/29.
  * @version: 1.0
@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-public @interface ATableAutoCreate {
+public @interface TableCreate {
 
     /**
      * table的基础表名
