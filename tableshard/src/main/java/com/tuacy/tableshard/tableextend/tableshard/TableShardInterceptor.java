@@ -188,12 +188,37 @@ public class TableShardInterceptor implements Interceptor {
         }
 
         TableShardParam annotation = parameter.getAnnotation(TableShardParam.class);
-        String dependFileName = annotation.dependFieldName();
-        if (StringUtils.isEmpty(dependFileName)) {
+        Class<?> parameterType = parameter.getType();
+        if (isPrimitive(parameterType)) {
             return getPrimitiveParamFieldValue(metaStatementHandler, parameter.getName());
         } else {
             return getParamObjectFiledValue(metaStatementHandler, parameter.getType(), annotation.dependFieldName());
         }
+    }
+
+    /**
+     * 判断是否是基础类型 9大基础类型及其包装类
+     *
+     * @return 是否是基础类型
+     */
+    private boolean isPrimitive(Class<?> clazz) {
+        if (clazz.isPrimitive()) {
+            return true;
+        }
+
+        try {
+            if (((Class) clazz.getField("TYPE").get(null)).isPrimitive()) {
+                return true;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        if (clazz.equals(String.class)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
