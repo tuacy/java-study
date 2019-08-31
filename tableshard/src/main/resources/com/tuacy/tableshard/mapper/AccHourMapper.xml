@@ -19,4 +19,46 @@
 
     </insert>
 
+    <!-- 批量插入多条记录 -->
+    <insert id="insertList">
+
+        insert into StatisAccHour (
+            `recTime`,
+            `ptId`,
+            `value`
+        ) values
+         <foreach collection="list" item="item" separator=",">
+             (
+                #{item.recTime},
+                #{item.ptId},
+                #{item.value}
+             )
+         </foreach>
+
+    </insert>
+
+    <!-- 查询一条记录 -->
+    <select id="selectItem" resultType="com.tuacy.tableshard.entity.model.AccHour">
+
+        select
+        `recTime` as recTime,
+        `ptId` as ptId,
+        `value` as value
+        from StatisAccHour
+        where recTime = #{recvTime} and ptId = #{pkId}
+
+    </select>
+
+    <!-- 查询一条记录 -->
+    <select id="selectLIst" resultType="com.tuacy.tableshard.entity.model.AccHour">
+
+        select
+        `recTime` as recTime,
+        `ptId` as ptId,
+        `value` as value
+        from StatisAccHour
+        where recTime >= ${startTime} and recTime <![CDATA[<=]]> ${endTime}
+
+    </select>
+
 </mapper>

@@ -335,6 +335,7 @@ public class TableShardInterceptor implements Interceptor {
 
     /**
      * 从参数里面找到指定对象指定字段对应的值--对象
+     * 如该参数是List.指定对象为第一个元素
      */
     private String getParamObjectFiledValue(MetaObject metaStatementHandler, String fieldParamKey, String dependFieldName) {
 
