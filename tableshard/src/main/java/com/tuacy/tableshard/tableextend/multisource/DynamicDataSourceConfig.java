@@ -1,4 +1,4 @@
-package com.tuacy.tableshard.tableextend.multidatasource;
+package com.tuacy.tableshard.tableextend.multisource;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.google.common.collect.Maps;
@@ -20,7 +20,7 @@ import java.util.Map;
 public class DynamicDataSourceConfig {
 
     /**
-     * 基础数据库
+     * 基础数据库   application.yml spring.datasource.druid.basic配置信息
      *
      * @return DataSource
      */
@@ -31,7 +31,7 @@ public class DynamicDataSourceConfig {
     }
 
     /**
-     * 历史数据库
+     * 历史数据库  application.yml spring.datasource.druid.history配置信息
      *
      * @return DataSource
      */
@@ -42,7 +42,7 @@ public class DynamicDataSourceConfig {
     }
 
     /**
-     * 统计数据库
+     * 统计数据库  application.yml  spring.datasource.druid.statis配置信息
      *
      * @return DataSource
      */
@@ -52,10 +52,18 @@ public class DynamicDataSourceConfig {
         return new DruidDataSource();
     }
 
+    /**
+     * 我们我们自定义的数据源DynamicRoutingDataSource添加到Spring容器里面去
+     *
+     * @param basicDataSource   基础数据库
+     * @param historyDataSource 历史数据库
+     * @param statisDataSource  统计数据库
+     */
     @Bean
     @Primary
     public DynamicRoutingDataSource dataSource(DataSource basicDataSource, DataSource historyDataSource, DataSource statisDataSource) {
         Map<Object, Object> targetDataSources = Maps.newHashMapWithExpectedSize(3);
+        // 每个key对应一个数据源
         targetDataSources.put(EDataSourceType.BASIC, basicDataSource);
         targetDataSources.put(EDataSourceType.HISTORY, historyDataSource);
         targetDataSources.put(EDataSourceType.STATIS, statisDataSource);

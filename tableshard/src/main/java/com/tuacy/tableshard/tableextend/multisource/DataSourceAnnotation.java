@@ -1,4 +1,4 @@
-package com.tuacy.tableshard.tableextend.multidatasource;
+package com.tuacy.tableshard.tableextend.multisource;
 
 import java.lang.annotation.*;
 

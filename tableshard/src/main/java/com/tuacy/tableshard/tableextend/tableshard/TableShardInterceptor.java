@@ -75,7 +75,7 @@ public class TableShardInterceptor implements Interceptor {
             // 判断方法上是否添加了 TableShardAnnotation 注解，因为只有添加了TableShard注解的方法我们才会去做分表处理
             TablePrepare tablePrepare = getTableShardAnnotation(mappedStatement);
 
-            // 没有加@TTablePrepare注解则不填家我们自定义的逻辑
+            // 没有加@TablePrepare注解则不填家我们自定义的逻辑
             if (tablePrepare == null) {
                 return invocation.proceed();
             }
@@ -87,6 +87,7 @@ public class TableShardInterceptor implements Interceptor {
                 invocation.proceed();
             }
 
+            // 获取到需要处理的表名
             String[] appointTable = tablePrepare.appointTable();
             if (appointTable.length == 0) {
                 List<String> tableNameList = getTableNamesFromSql(originSql);
@@ -113,9 +114,10 @@ public class TableShardInterceptor implements Interceptor {
                 tableStrategy = strategyClass.newInstance();
             }
 
+            // 分表处理的时候,我们一般是依赖参数里面的某个值来进行的.这里用于获取到参数对应的值.
             String dependValue = getDependFieldValue(tablePrepare, metaStatementHandler, mappedStatement);
 
-            // 启用自动建表
+            // 自动建表处理逻辑(表不存在的时候,我们会建表)
             if (tablePrepare.enableAutoCreateTable()) {
                 SqlSessionTemplate template = SpringContextHolder.getBean(SqlSessionTemplate.class);
                 for (String tableName : appointTable) {
@@ -153,7 +155,7 @@ public class TableShardInterceptor implements Interceptor {
                 }
             }
 
-            // 启用分表
+            // 分表处理逻辑
             if (strategyClass != TableNameStrategyVoid.class) {
                 if (tablePrepare.enableTableShard()) {
                     String updateSql = originSql;
@@ -165,7 +167,6 @@ public class TableShardInterceptor implements Interceptor {
                         }
                     }
 
-//                    System.out.println(updateSql);
                     // 把新语句设置回去，替换表名
                     metaStatementHandler.setValue("delegate.boundSql.sql", updateSql);
                 }

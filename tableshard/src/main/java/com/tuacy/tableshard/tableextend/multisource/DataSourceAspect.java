@@ -1,4 +1,4 @@
-package com.tuacy.tableshard.tableextend.multidatasource;
+package com.tuacy.tableshard.tableextend.multisource;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -25,7 +25,7 @@ public class DataSourceAspect {
     /**
      * 所有添加了DataSourceAnnotation的方法都进入切面
      */
-    @Pointcut("@annotation(com.tuacy.tableshard.tableextend.multidatasource.DataSourceAnnotation)")
+    @Pointcut("@annotation(com.tuacy.tableshard.tableextend.multisource.DataSourceAnnotation)")
     public void dataSourcePointCut() {
     }
 
@@ -34,6 +34,7 @@ public class DataSourceAspect {
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
 
+        // 在执行方法之前设置使用哪个数据源
         DataSourceAnnotation ds = method.getAnnotation(DataSourceAnnotation.class);
         if (ds == null) {
             DynamicRoutingDataSource.setDataSource(EDataSourceType.BASIC);

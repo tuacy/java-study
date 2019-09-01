@@ -5,7 +5,7 @@ package com.tuacy.tableshard.tableextend.tableshard;
  * @author: tuacy.
  * @date: 2019/8/13.
  * @version: 1.0
- * @Description:
+ * @Description: 分表对应的策略
  */
 public interface ITableNameStrategy {
 

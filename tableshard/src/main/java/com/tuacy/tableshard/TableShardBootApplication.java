@@ -1,6 +1,6 @@
 package com.tuacy.tableshard;
 
-import com.tuacy.tableshard.tableextend.multidatasource.DynamicDataSourceConfig;
+import com.tuacy.tableshard.tableextend.multisource.DynamicDataSourceConfig;
 import com.tuacy.tableshard.tableextend.tableshard.TableCreateScan;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
