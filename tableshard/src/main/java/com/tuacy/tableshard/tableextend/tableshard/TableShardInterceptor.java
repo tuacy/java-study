@@ -48,7 +48,7 @@ public class TableShardInterceptor implements Interceptor {
      * sql语句里面去获取表名的依据（主要，全部是小写的）
      * 说白了就是哪些字符串后面会跟上表名
      */
-    private final static String[] SQL_TABLE_NAME_FLAG_PREFIX = {"from ", "from\n", "join ", "join\n", "update ", "update\n", "insert into ", "insert into\n"};
+    private final static String[] SQL_TABLE_NAME_FLAG_PREFIX = {"from", "join", "update", "insert into"};
 
     private static final ObjectFactory DEFAULT_OBJECT_FACTORY = new DefaultObjectFactory();
     private static final ObjectWrapperFactory DEFAULT_OBJECT_WRAPPER_FACTORY = new DefaultObjectWrapperFactory();
@@ -162,9 +162,7 @@ public class TableShardInterceptor implements Interceptor {
                     for (String tableName : appointTable) {
                         // 策略处理表名
                         String newTableName = tableStrategy.tableName(tableName, dependValue);
-                        for (String item : SQL_TABLE_NAME_FLAG_PREFIX) {
-                            updateSql = updateSql.replaceAll(item + tableName, item + newTableName);
-                        }
+                        updateSql = updateSql.replaceAll(tableName, newTableName);
                     }
 
                     // 把新语句设置回去，替换表名
@@ -264,21 +262,46 @@ public class TableShardInterceptor implements Interceptor {
      */
     private List<String> getTableNamesFromSql(String sql) {
         List<String> tableNameList = Lists.newArrayList();
-
         for (String item : SQL_TABLE_NAME_FLAG_PREFIX) {
-            String sqlTemp = sql;
-            int tableNameFlag = sqlTemp.toLowerCase().indexOf(item);
-            while (tableNameFlag != -1) {
-                String afterSql = sqlTemp.substring(tableNameFlag + item.length(), sql.length() - 1).trim();
-                sqlTemp = afterSql;
-                // 第一个位置是空格
-                tableNameList.add(afterSql.substring(0, afterSql.indexOf(" ")));
-                tableNameFlag = afterSql.indexOf(item);
-            }
+            tableNameList.addAll(getTableNamesBySql(sql, item));
         }
-
         return tableNameList;
     }
+
+    /**
+     * 解析sql获取表名，按照顺序从前往后解析
+     *
+     * @param sql sql
+     * @return 表名列表
+     */
+    private List<String> getTableNamesBySql(String sql, String namePreFlag) {
+        List<String> tableNameList = Lists.newArrayList();
+        String sqlTemp = sql.trim().toLowerCase();
+        int checkStartIndex = 0;
+        do {
+            // 标志(from、insert into等等)所在的位置
+            checkStartIndex = sqlTemp.indexOf(namePreFlag.toLowerCase(), checkStartIndex);
+            if (checkStartIndex != -1) {
+                String nextTableNameSql = sqlTemp.substring(checkStartIndex + namePreFlag.length());
+                if (sqlTableNameStart(nextTableNameSql)) {
+                    int beforeInvalidNum = sqlTableNameBeforeInvalid(nextTableNameSql);
+                    if (beforeInvalidNum > 0) {
+                        // 去掉无效的字符
+                        nextTableNameSql = nextTableNameSql.substring(beforeInvalidNum);
+                    }
+                    int tableNameStartIndex = checkStartIndex + namePreFlag.length() + beforeInvalidNum;
+                    int tableNameLength = tableNameLength(nextTableNameSql);
+                    tableNameList.add(sql.substring(tableNameStartIndex, tableNameStartIndex + tableNameLength));
+                    checkStartIndex = tableNameStartIndex + tableNameLength;
+                } else {
+                    checkStartIndex = checkStartIndex + 1;
+                }
+            }
+        } while (checkStartIndex != -1);
+
+        return tableNameList.stream().distinct().collect(Collectors.toList());
+    }
+
 
     /**
      * 获取方法上的TableShard注解
@@ -364,5 +387,41 @@ public class TableShardInterceptor implements Interceptor {
 
     @Override
     public void setProperties(Properties properties) {
+    }
+
+    /**
+     * 判断后面的sql语句里面是否带表名，我们默认认为每个表名字的前面都会有 ' '、'\n'、'\t'
+     */
+    private boolean sqlTableNameStart(String source) {
+        return source.startsWith(" ") || source.startsWith("\n") || source.startsWith("\t");
+    }
+
+    /**
+     * from(insert into等)和table name之前无效字符个数
+     */
+    private int sqlTableNameBeforeInvalid(String source) {
+        int startNum = 0;
+        while (source.startsWith(" ") || source.startsWith("\n") || source.startsWith("\t")) {
+            startNum++;
+            if (source.length() == 1) {
+                break;
+            }
+            source = source.substring(1);
+        }
+        return startNum;
+    }
+
+    /**
+     * table name长度,我们默认表名字后面会带 ' '、'\n'、'\t'、'('、
+     */
+    private int tableNameLength(String source) {
+        char[] charList = source.toCharArray();
+        int index;
+        for (index = 0; index < charList.length; index++) {
+            if (charList[index] == ' ' || charList[index] == '\n' || charList[index] == '\t' || charList[index] == '(') {
+                break;
+            }
+        }
+        return index;
     }
 }

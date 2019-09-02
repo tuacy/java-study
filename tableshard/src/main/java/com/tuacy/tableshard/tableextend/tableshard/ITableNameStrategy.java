@@ -13,7 +13,7 @@ public interface ITableNameStrategy {
      * 表名字
      *
      * @param oldTableName     表基本名字
-     * @param dependFieldValue 根据该字段确定表名
+     * @param dependFieldValue 根据该字段确定表名(Mapper方法的某个参数对应的值)
      * @return 表名
      */
     String tableName(String oldTableName, String dependFieldValue);

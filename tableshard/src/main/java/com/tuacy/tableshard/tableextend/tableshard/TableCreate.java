@@ -33,8 +33,6 @@ public @interface TableCreate {
 
     /**
      * Mapper文件里面的函数名字（创建表对应的函数）
-     * 支持两种情况：1.函数没有参数的时候，mapper.xml里面直接指定了表的名字
-     * 2.函数只有一个参数--表名
      */
     String autoCreateTableMapperMethodName();
 }
