@@ -168,6 +168,9 @@ public class TableShardInterceptor implements Interceptor {
                     // 把新语句设置回去，替换表名
                     metaStatementHandler.setValue("delegate.boundSql.sql", updateSql);
                 }
+            } else {
+                // fix 启用了自动建表，但是没有启用分表的时候，sql被替换成建表的sql。没有设置回来的问题
+                metaStatementHandler.setValue("delegate.boundSql.sql", originSql);
             }
         } catch (Exception ignored) {
             // ignore 任何一个地方有异常都去执行原始操作 -- invocation.proceed()
