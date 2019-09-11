@@ -1,5 +1,7 @@
 package com.tuacy.tableshard.tableextend.tableshard;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.tuacy.tableshard.hook.SpringContextHolder;
 import com.tuacy.tableshard.utils.ReflectUtil;
@@ -264,45 +266,62 @@ public class TableShardInterceptor implements Interceptor {
      * @return 表名列表
      */
     private List<String> getTableNamesFromSql(String sql) {
+        // 对sql语句进行拆分 -- 以'，'、'\n'、'\t'作为分隔符
+        List<String> splitterList = Lists.newArrayList(Splitter.on(new CharMatcher() {
+            @Override
+            public boolean matches(char c) {
+                return Character.isWhitespace(c) || c == '\n' || c == '\t';
+            }
+        }).omitEmptyStrings().trimResults().split(sql))
+                .stream()
+                .filter(s -> !s.equals(","))
+                .filter(s -> !s.equals("?"))
+                .filter(s -> !s.equals("?,"))
+                .filter(s -> !s.equals("("))
+                .filter(s -> !s.equals(")"))
+                .filter(s -> !s.equals("="))
+                .collect(Collectors.toList());
         List<String> tableNameList = Lists.newArrayList();
         for (String item : SQL_TABLE_NAME_FLAG_PREFIX) {
-            tableNameList.addAll(getTableNamesBySql(sql, item));
+            tableNameList.addAll(getTableName(splitterList, Lists.newArrayList(Splitter.on(' ').split(item))));
         }
         return tableNameList;
     }
 
     /**
-     * 解析sql获取表名，按照顺序从前往后解析
-     *
-     * @param sql sql
-     * @return 表名列表
+     * 获取表名
      */
-    private List<String> getTableNamesBySql(String sql, String namePreFlag) {
-        List<String> tableNameList = Lists.newArrayList();
-        String sqlTemp = sql.trim().toLowerCase();
-        int checkStartIndex = 0;
-        do {
-            // 标志(from、insert into等等)所在的位置
-            checkStartIndex = sqlTemp.indexOf(namePreFlag.toLowerCase(), checkStartIndex);
-            if (checkStartIndex != -1) {
-                String nextTableNameSql = sqlTemp.substring(checkStartIndex + namePreFlag.length());
-                if (sqlTableNameStart(nextTableNameSql)) {
-                    int beforeInvalidNum = sqlTableNameBeforeInvalid(nextTableNameSql);
-                    if (beforeInvalidNum > 0) {
-                        // 去掉无效的字符
-                        nextTableNameSql = nextTableNameSql.substring(beforeInvalidNum);
+    private List<String> getTableName(List<String> splitterList, List<String> list) {
+        List<String> retList = Lists.newArrayList();
+        if (list == null || list.isEmpty() || splitterList == null || splitterList.isEmpty() || splitterList.size() <= list.size()) {
+            return retList;
+        }
+        for (int index = 0; index < splitterList.size(); index = index + list.size()) {
+
+            if (index < splitterList.size() - list.size()) {
+                boolean match = true;
+                for (int innerIndex = 0; innerIndex < list.size(); innerIndex++) {
+                    if (!splitterList.get(index + innerIndex).toLowerCase().equals(list.get(innerIndex).toLowerCase())) {
+                        match = false;
+                        break;
                     }
-                    int tableNameStartIndex = checkStartIndex + namePreFlag.length() + beforeInvalidNum;
-                    int tableNameLength = tableNameLength(nextTableNameSql);
-                    tableNameList.add(sql.substring(tableNameStartIndex, tableNameStartIndex + tableNameLength));
-                    checkStartIndex = tableNameStartIndex + tableNameLength;
-                } else {
-                    checkStartIndex = checkStartIndex + 1;
+                }
+                if (match) {
+                    if ("update".toLowerCase().equals(list.get(0).toLowerCase())) {
+                        // ON DUPLICATE KEY UPDATE 需要过滤出来
+                        if (index < 3 || !(splitterList.get(index - 1).toLowerCase().equals("key".toLowerCase()) &&
+                                splitterList.get(index - 2).toLowerCase().equals("DUPLICATE".toLowerCase()) &&
+                                splitterList.get(index - 3).toLowerCase().equals("ON".toLowerCase()))) {
+                            retList.add(splitterList.get(index + list.size()));
+                        }
+                    } else {
+                        retList.add(splitterList.get(index + list.size()));
+                    }
                 }
             }
-        } while (checkStartIndex != -1);
 
-        return tableNameList.stream().distinct().collect(Collectors.toList());
+        }
+        return retList;
     }
 
 
@@ -390,41 +409,5 @@ public class TableShardInterceptor implements Interceptor {
 
     @Override
     public void setProperties(Properties properties) {
-    }
-
-    /**
-     * 判断后面的sql语句里面是否带表名，我们默认认为每个表名字的前面都会有 ' '、'\n'、'\t'
-     */
-    private boolean sqlTableNameStart(String source) {
-        return source.startsWith(" ") || source.startsWith("\n") || source.startsWith("\t");
-    }
-
-    /**
-     * from(insert into等)和table name之前无效字符个数
-     */
-    private int sqlTableNameBeforeInvalid(String source) {
-        int startNum = 0;
-        while (source.startsWith(" ") || source.startsWith("\n") || source.startsWith("\t")) {
-            startNum++;
-            if (source.length() == 1) {
-                break;
-            }
-            source = source.substring(1);
-        }
-        return startNum;
-    }
-
-    /**
-     * table name长度,我们默认表名字后面会带 ' '、'\n'、'\t'、'('、
-     */
-    private int tableNameLength(String source) {
-        char[] charList = source.toCharArray();
-        int index;
-        for (index = 0; index < charList.length; index++) {
-            if (charList[index] == ' ' || charList[index] == '\n' || charList[index] == '\t' || charList[index] == '(') {
-                break;
-            }
-        }
-        return index;
     }
 }
