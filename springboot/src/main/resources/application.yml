@@ -3,6 +3,9 @@ server:
 spring:
   application:
     name: study-springboot
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
 
 # 自定义的一些属性
 user:
