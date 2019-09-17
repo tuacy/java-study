@@ -37,7 +37,8 @@ public class CustomBeanDefinitionRegistryPostProcessor implements BeanDefinition
     }
 
     /**
-     * 方法, 这个方法被调用的时候, 所有的Bean已经被创建, 但是还没有被初始化. 也就是说, 通过它我们可以在初始化任何Bean之前, 做各种操作, 甚至读取并修改BeanDefinition(bean定义的元数据)
+     * 这个方法被调用的时候, 所有的Bean已经被创建, 但是还没有被初始化.
+     * 也就是说, 通过它我们可以在初始化任何Bean之前, 做各种操作, 甚至读取并修改BeanDefinition(bean定义的元数据)
      * 比如，我们可以在这个方法里面修改某个对象的属性
      */
     @Override
