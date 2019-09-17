@@ -353,14 +353,18 @@ public class TableShardInterceptor implements Interceptor {
     /**
      * 从参数里面找到指定对象指定字段对应的值--基础类型
      */
-    private String getPrimitiveParamFieldValue(MetaObject metaStatementHandler, String dependFieldName) {
+    private String getPrimitiveParamFieldValue(MetaObject metaStatementHandler, String fieldParamKey) {
         BoundSql boundSql = (BoundSql) metaStatementHandler.getValue("delegate.boundSql");
         Object parameterObject = boundSql.getParameterObject();
         if (parameterObject == null) {
             return null;
         }
-
-        return ((MapperMethod.ParamMap) parameterObject).get(dependFieldName).toString();
+        Object filterFiledObject = ((MapperMethod.ParamMap) parameterObject).get(fieldParamKey);
+        if (filterFiledObject == null) {
+            return null;
+        }
+        Object dependObject = recursiveGetEffectiveObject(filterFiledObject);
+        return dependObject == null ? null : dependObject.toString();
     }
 
     /**
