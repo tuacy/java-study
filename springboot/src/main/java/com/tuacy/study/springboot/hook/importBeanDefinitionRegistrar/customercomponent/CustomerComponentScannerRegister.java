@@ -16,18 +16,22 @@ import org.springframework.core.type.AnnotationMetadata;
  */
 public class CustomerComponentScannerRegister implements ImportBeanDefinitionRegistrar, ResourceLoaderAware {
 
+    private final static String PACKAGE_NAME_KEY = "basePackages";
+
     private ResourceLoader resourceLoader;
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
-        AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(annotationMetadata.getAnnotationAttributes(CustomerComponent.class.getName()));
+        AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(annotationMetadata.getAnnotationAttributes(CustomerComponentScan.class.getName()));
         if (annoAttrs == null || annoAttrs.isEmpty()) {
             return;
         }
-        MyClassPathBeanDefinitionScanner scanner = new MyClassPathBeanDefinitionScanner(beanDefinitionRegistry, false);
+        // 搜索路径
+        String[] basePackages = (String[]) annoAttrs.get(PACKAGE_NAME_KEY);
+        CustomerComponentClassPathBeanDefinitionScanner scanner = new CustomerComponentClassPathBeanDefinitionScanner(beanDefinitionRegistry, false);
         scanner.setResourceLoader(resourceLoader);
         scanner.registerFilters();
-        scanner.doScan("com.faderw.school.domain");
+        scanner.doScan(basePackages);
     }
 
     @Override

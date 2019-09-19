@@ -77,10 +77,12 @@ public enum RunStartManager {
             if (resources.length == 0) {
                 return Collections.emptyList();
             }
-
+            String packageBasePath = packageName.replace(".", "/");
             for (Resource resource : resources) {
                 try {
-                    classes.add((Thread.currentThread().getContextClassLoader().loadClass((packageName + "." + resource.getFilename()).replace(".class", ""))));
+                    String resourceUriPath = resource.getURL().getPath();
+                    String resourcePackage = resourceUriPath.substring(resourceUriPath.indexOf(packageBasePath)).replace("/", ".").replace(".class", "");
+                    classes.add((Thread.currentThread().getContextClassLoader().loadClass(resourcePackage)));
                 } catch (Exception ignored) {
                 }
             }

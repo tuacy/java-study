@@ -22,17 +22,17 @@ public class BeanMessageSourceAware implements MessageSourceAware {
 
     public void printMessage() {
 
-        String hello = messageSource.getMessage("hello", null, "", null);
-
-        String name = messageSource.getMessage("hello",
-                new Object[]{28, "http://www.yiibai.com"}, Locale.US);
-
-        System.out.println("Customer name (English) : " + name);
-
-        String namechinese = messageSource.getMessage("customer.name",
-                new Object[]{28, "http://www.yiibai.com"},
-                Locale.SIMPLIFIED_CHINESE);
-
-        System.out.println("Customer name (Chinese) : " + namechinese);
+//        String hello = messageSource.getMessage("hello", null, "", null);
+//
+//        String name = messageSource.getMessage("hello",
+//                new Object[]{28, "http://www.yiibai.com"}, Locale.US);
+//
+//        System.out.println("Customer name (English) : " + name);
+//
+//        String namechinese = messageSource.getMessage("customer.name",
+//                new Object[]{28, "http://www.yiibai.com"},
+//                Locale.SIMPLIFIED_CHINESE);
+//
+//        System.out.println("Customer name (Chinese) : " + namechinese);
     }
 }

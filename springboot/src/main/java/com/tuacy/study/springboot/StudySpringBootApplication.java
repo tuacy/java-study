@@ -3,6 +3,7 @@ package com.tuacy.study.springboot;
 import com.tuacy.study.springboot.configuration.UserInfo;
 import com.tuacy.study.springboot.hook.classPathBeanDefinitionScanner.BeanIocScan;
 import com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.RunStartScan;
+import com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.customercomponent.CustomerComponentScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -12,6 +13,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @RunStartScan(basePackages = {"com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.runstart"})
 @BeanIocScan(basePackages = {"com.tuacy.study.springboot.hook.classPathBeanDefinitionScanner.autoioc"})
 @EnableConfigurationProperties(value = {UserInfo.class})
+@CustomerComponentScan(basePackages = "com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.customercomponent")
 public class StudySpringBootApplication {
 
     public static void main(String[] args) {
