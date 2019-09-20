@@ -1,5 +1,6 @@
 package com.tuacy.study.springboot.hook.importSelector;
 
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Import;
  * @Description:
  */
 @Configuration
+@ComponentScan("com.tuacy.study.springboot.hook.importSelector")
 @Import(DynamicSelectImport.class)
 public class DynamicSelectConfigure {
 }
