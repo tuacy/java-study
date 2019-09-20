@@ -1,6 +1,6 @@
 package com.tuacy.study.springboot.applicationinit;
 
-import com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.RunStartManager;
+import com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.runstart.RunStartManager;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;

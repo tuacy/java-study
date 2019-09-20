@@ -1,4 +1,4 @@
-package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.customercomponent;
+package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.beanioc;
 
 /**
  * @name: CustomerComponentBean
@@ -7,7 +7,7 @@ package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.customerco
  * @version: 1.0
  * @Description:
  */
-@CustomerComponent
+@BeanIoc
 public class CustomerComponentBean {
 
     public void testFunction() {

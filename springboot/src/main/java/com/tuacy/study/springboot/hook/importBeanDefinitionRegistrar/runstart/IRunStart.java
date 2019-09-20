@@ -1,4 +1,4 @@
-package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar;
+package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.runstart;
 
 /**
  * @name: IRunStart

@@ -1,4 +1,4 @@
-package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.customercomponent;
+package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.beanioc;
 
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ResourceLoaderAware;
@@ -14,7 +14,7 @@ import org.springframework.core.type.AnnotationMetadata;
  * @version: 1.0
  * @Description:
  */
-public class CustomerComponentScannerRegister implements ImportBeanDefinitionRegistrar, ResourceLoaderAware {
+public class BeanIocScannerRegister implements ImportBeanDefinitionRegistrar, ResourceLoaderAware {
 
     private final static String PACKAGE_NAME_KEY = "basePackages";
 
@@ -22,13 +22,13 @@ public class CustomerComponentScannerRegister implements ImportBeanDefinitionReg
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
-        AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(annotationMetadata.getAnnotationAttributes(CustomerComponentScan.class.getName()));
+        AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(annotationMetadata.getAnnotationAttributes(BeanIocScan.class.getName()));
         if (annoAttrs == null || annoAttrs.isEmpty()) {
             return;
         }
         // 搜索路径
         String[] basePackages = (String[]) annoAttrs.get(PACKAGE_NAME_KEY);
-        CustomerComponentClassPathBeanDefinitionScanner scanner = new CustomerComponentClassPathBeanDefinitionScanner(beanDefinitionRegistry, false);
+        BeanIocClassPathBeanDefinitionScanner scanner = new BeanIocClassPathBeanDefinitionScanner(beanDefinitionRegistry, false);
         scanner.setResourceLoader(resourceLoader);
         scanner.registerFilters();
         scanner.doScan(basePackages);

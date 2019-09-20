@@ -1,4 +1,4 @@
-package com.tuacy.study.springboot.hook.classPathBeanDefinitionScanner;
+package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.beanioc;
 
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -8,19 +8,29 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import java.util.Set;
 
 /**
- * 在指定包小扫描指定条件的类,添加到IOC容器里面去
+ * @name: BeanIocClassPathBeanDefinitionScanner
+ * @author: tuacy.
+ * @date: 2019/9/16.
+ * @version: 1.0
+ * @Description:
  */
-public class CustomClassPathBeanDefinitionScanner extends ClassPathBeanDefinitionScanner {
-    public CustomClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry, boolean useDefaultFilters) {
+public class BeanIocClassPathBeanDefinitionScanner extends ClassPathBeanDefinitionScanner {
+
+    public BeanIocClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry, boolean useDefaultFilters) {
         super(registry, useDefaultFilters);
     }
 
     protected void registerFilters() {
+        // 只搜索添加了CustomerComponent注解的类
         addIncludeFilter(new AnnotationTypeFilter(BeanIoc.class));
     }
 
+    /**
+     * 指定收缩路径
+     */
     @Override
     protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
         return super.doScan(basePackages);
     }
+
 }

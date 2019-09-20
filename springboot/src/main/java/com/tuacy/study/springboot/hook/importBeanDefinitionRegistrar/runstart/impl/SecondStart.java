@@ -1,7 +1,7 @@
-package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.runstart;
+package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.runstart.impl;
 
-import com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.IRunStart;
-import com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.RunStart;
+import com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.runstart.IRunStart;
+import com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.runstart.RunStart;
 
 /**
  * @name: FirstStart

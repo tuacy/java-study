@@ -1,19 +1,17 @@
 package com.tuacy.study.springboot;
 
 import com.tuacy.study.springboot.configuration.UserInfo;
-import com.tuacy.study.springboot.hook.classPathBeanDefinitionScanner.BeanIocScan;
-import com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.RunStartScan;
-import com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.customercomponent.CustomerComponentScan;
+import com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.beanioc.BeanIocScan;
+import com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.runstart.RunStartScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
 // 会去这个包下面查找添加饿了RunStart注解的类，执行指定的方法
-@RunStartScan(basePackages = {"com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.runstart"})
-@BeanIocScan(basePackages = {"com.tuacy.study.springboot.hook.classPathBeanDefinitionScanner.autoioc"})
+@RunStartScan(basePackages = {"com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.runstart.impl"})
 @EnableConfigurationProperties(value = {UserInfo.class})
-@CustomerComponentScan(basePackages = "com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.customercomponent")
+@BeanIocScan(basePackages = "com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.beanioc")
 public class StudySpringBootApplication {
 
     public static void main(String[] args) {

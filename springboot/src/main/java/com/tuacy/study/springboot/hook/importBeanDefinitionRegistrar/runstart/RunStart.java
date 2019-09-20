@@ -1,4 +1,4 @@
-package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.customercomponent;
+package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.runstart;
 
 import org.springframework.context.annotation.Import;
 
@@ -14,7 +14,16 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-@Import(CustomerComponentScannerRegister.class)
-public @interface CustomerComponentScan {
-    String[] basePackages() default "";
+@Import(RunStartScannerRegister.class)
+public @interface RunStart {
+
+    /**
+     * 描述信息
+     */
+    String des() default "";
+
+    /**
+     * 执行顺序
+     */
+    int order() default 0;
 }

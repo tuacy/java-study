@@ -1,4 +1,4 @@
-package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.customercomponent;
+package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.beanioc;
 
 import java.lang.annotation.*;
 
@@ -12,6 +12,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-public @interface CustomerComponent {
+public @interface BeanIoc {
 
 }
