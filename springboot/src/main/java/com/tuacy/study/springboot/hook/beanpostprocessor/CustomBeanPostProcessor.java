@@ -64,7 +64,7 @@ public class CustomBeanPostProcessor implements BeanPostProcessor {
 
     @SuppressWarnings("unchecked")
     private void handleRoutingInjected(Field field, Object bean, Class type) throws IllegalAccessException {
-        // 获取type的所有的bean
+        // 获取type的所有的bean,key就是bean对应的名字,value就是bean对象
         Map<String, Object> candidates = this.applicationContext.getBeansOfType(type);
         if (candidates.isEmpty()) {
             throw new IllegalAccessException(type.getSimpleName() + " 没有实现类");
