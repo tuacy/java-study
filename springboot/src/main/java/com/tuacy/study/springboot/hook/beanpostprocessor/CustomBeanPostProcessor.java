@@ -43,6 +43,7 @@ public class CustomBeanPostProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class clazz = bean.getClass();
+        // 获取所有的属性
         Field[] fields = clazz.getDeclaredFields();
         for (Field f : fields) {
             // 找到对象里面添加了RoutingInjected注解的属性
@@ -74,7 +75,7 @@ public class CustomBeanPostProcessor implements BeanPostProcessor {
             // 如果type只有一个bean,那么直接设置就好了
             field.set(bean, candidates.values().iterator().next());
         } else {
-            // 如果有多个实现类,我们就需要看用那个来代理执行了
+            // 如果有多个实现类,我们就需要看用那个来代理执行了.(用代理类来替换)
             Object proxy = RoutingBeanProxyFactory.crateProxy(type, candidates);
             field.set(bean, proxy);
         }
