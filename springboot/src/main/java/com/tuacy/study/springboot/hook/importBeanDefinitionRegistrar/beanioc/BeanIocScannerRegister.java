@@ -2,10 +2,12 @@ package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.beanioc;
 
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 /**
  * @name: RunStartScannerRegister
@@ -28,10 +30,10 @@ public class BeanIocScannerRegister implements ImportBeanDefinitionRegistrar, Re
         }
         // 搜索路径
         String[] basePackages = (String[]) annoAttrs.get(PACKAGE_NAME_KEY);
-        BeanIocClassPathBeanDefinitionScanner scanner = new BeanIocClassPathBeanDefinitionScanner(beanDefinitionRegistry, false);
+        ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(beanDefinitionRegistry, false);
         scanner.setResourceLoader(resourceLoader);
-        scanner.registerFilters();
-        scanner.doScan(basePackages);
+        scanner.addIncludeFilter(new AnnotationTypeFilter(BeanIoc.class));
+        scanner.scan(basePackages);
     }
 
     @Override
