@@ -24,12 +24,13 @@ public class BeanIocScannerRegister implements ImportBeanDefinitionRegistrar, Re
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
+        //1. 从BeanIocScan主机获取到元数据，指定搜索路径
         AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(annotationMetadata.getAnnotationAttributes(BeanIocScan.class.getName()));
         if (annoAttrs == null || annoAttrs.isEmpty()) {
             return;
         }
-        // 搜索路径
         String[] basePackages = (String[]) annoAttrs.get(PACKAGE_NAME_KEY);
+        // 2. 找到指定路径下所有添加了BeanIoc注解的类，添加到IOC容器里面去
         ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(beanDefinitionRegistry, false);
         scanner.setResourceLoader(resourceLoader);
         scanner.addIncludeFilter(new AnnotationTypeFilter(BeanIoc.class));

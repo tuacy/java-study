@@ -1,13 +1,14 @@
 package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.runstart;
 
 import com.google.common.collect.Lists;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.core.type.filter.AssignableTypeFilter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @name: RunStartManager
@@ -24,13 +25,7 @@ public enum RunStartManager {
 
     public void autoStartScan(String[] basePackage) {
         // 初始化规约信息
-        List<Class<IRunStart>> classess;
-        try {
-            classess = getClassesList(basePackage);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
+        List<Class<IRunStart>> classess = getClassesList(basePackage);
         List<InnerAutoStartClassInfo> classInfo = Lists.newArrayList();
         for (Class<IRunStart> aClass : classess) {
             RunStart annotation = aClass.getAnnotation(RunStart.class);
@@ -63,39 +58,29 @@ public enum RunStartManager {
      * @param packageNames 包名
      * @return 所有加了规约注解的类
      */
-    public List<Class<IRunStart>> getClassesList(String[] packageNames) throws Exception {
+    public List<Class<IRunStart>> getClassesList(String[] packageNames) {
         if (packageNames == null || packageNames.length == 0) {
             return Lists.newArrayList();
         }
+        List<Class<IRunStart>> classes = new ArrayList<>();
+        ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
+        scanner.addIncludeFilter(new AnnotationTypeFilter(RunStart.class));
+        scanner.addIncludeFilter(new AssignableTypeFilter(IRunStart.class));
+        for (String packageItem : packageNames) {
+            Set<BeanDefinition> tempClassList = scanner.findCandidateComponents(packageItem);
+            if (!tempClassList.isEmpty()) {
+                tempClassList.forEach(beanDefinition -> {
+                    try {
+                        classes.add((Class<IRunStart>) Thread.currentThread().getContextClassLoader().loadClass(beanDefinition.getBeanClassName()));
+                    } catch (Exception ignore) {
 
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(Thread.currentThread().getContextClassLoader());
+                    }
+                });
 
-        List<Class<?>> classes = new ArrayList<>();
-        for (String packageName : packageNames) {
-            String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX + packageName.replace(".", "/") + "/**/*.class";
-            Resource[] resources = resolver.getResources(packageSearchPath);
-            if (resources.length == 0) {
-                return Collections.emptyList();
-            }
-            String packageBasePath = packageName.replace(".", "/");
-            for (Resource resource : resources) {
-                try {
-                    String resourceUriPath = resource.getURL().getPath();
-                    String resourcePackage = resourceUriPath.substring(resourceUriPath.indexOf(packageBasePath)).replace("/", ".").replace(".class", "");
-                    classes.add((Thread.currentThread().getContextClassLoader().loadClass(resourcePackage)));
-                } catch (Exception ignored) {
-                }
             }
         }
 
-        List<Class<IRunStart>> output = Lists.newArrayList();
-        for (Class<?> aClass : classes) {
-            if (aClass.isAnnotationPresent(RunStart.class) && IRunStart.class.isAssignableFrom(aClass)) {
-                output.add((Class<IRunStart>) aClass);
-            }
-        }
-
-        return output;
+        return classes;
     }
 
 
