@@ -11,8 +11,17 @@ import org.springframework.context.ApplicationEvent;
  */
 public class CustomerEvent extends ApplicationEvent {
 
-    public CustomerEvent(Object source) {
+    /**
+     * 事件内容
+     */
+    private String content;
+
+    public CustomerEvent(Object source, String content) {
         super(source);
+        this.content = content;
     }
 
+    public String getContent() {
+        return content;
+    }
 }

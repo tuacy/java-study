@@ -1,6 +1,5 @@
 package com.tuacy.study.springboot.hook.applicationListener;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -12,9 +11,11 @@ import org.springframework.stereotype.Component;
  * @Description: 通过@EventListener监听事件
  */
 @Component
-@Slf4j
 public class AnnotationListener {
 
+    /**
+     * 通过@EventListener组件监听到我们发送的CustomerEvent事件
+     */
     @EventListener
     public void customerEvent(CustomerEvent event) {
         System.out.println("收到是消息:" + event.getSource());

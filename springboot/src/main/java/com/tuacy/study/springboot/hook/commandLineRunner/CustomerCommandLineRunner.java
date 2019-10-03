@@ -26,6 +26,6 @@ public class CustomerCommandLineRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         System.out.println("-------- CommandLineRunner ---------- ");
-        applicationContext.publishEvent(new CustomerEvent("CommandLineRunner"));
+        applicationContext.publishEvent(new CustomerEvent(this, "CommandLineRunner"));
     }
 }
