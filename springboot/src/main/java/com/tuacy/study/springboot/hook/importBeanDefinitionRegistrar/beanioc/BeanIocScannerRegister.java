@@ -2,10 +2,12 @@ package com.tuacy.study.springboot.hook.importBeanDefinitionRegistrar.beanioc;
 
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 /**
  * @name: RunStartScannerRegister
@@ -22,16 +24,17 @@ public class BeanIocScannerRegister implements ImportBeanDefinitionRegistrar, Re
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
+        //1. 从BeanIocScan主机获取到元数据，指定搜索路径
         AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(annotationMetadata.getAnnotationAttributes(BeanIocScan.class.getName()));
         if (annoAttrs == null || annoAttrs.isEmpty()) {
             return;
         }
-        // 搜索路径
         String[] basePackages = (String[]) annoAttrs.get(PACKAGE_NAME_KEY);
-        BeanIocClassPathBeanDefinitionScanner scanner = new BeanIocClassPathBeanDefinitionScanner(beanDefinitionRegistry, false);
+        // 2. 找到指定路径下所有添加了BeanIoc注解的类，添加到IOC容器里面去
+        ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(beanDefinitionRegistry, false);
         scanner.setResourceLoader(resourceLoader);
-        scanner.registerFilters();
-        scanner.doScan(basePackages);
+        scanner.addIncludeFilter(new AnnotationTypeFilter(BeanIoc.class));
+        scanner.scan(basePackages);
     }
 
     @Override

@@ -2,17 +2,30 @@ package com.tuacy.study.springboot.aware.ImportAware;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportAware;
+import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.stereotype.Component;
-
-import java.util.Set;
 
 @Configuration
-@Component
 public class BeanImportAware implements ImportAware {
+
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public void setImportMetadata(AnnotationMetadata importMetadata) {
-        Set<String> sets = importMetadata.getAnnotationTypes();
-        int a = 10;
+
+        AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(importMetadata.getAnnotationAttributes(ChangeAttribute.class.getName()));
+        if (annoAttrs != null) {
+            // 获取到ChangeAttribute注解里面的属性
+            name = (String) annoAttrs.get("value");
+        }
+
     }
 }
