@@ -27,6 +27,6 @@ public class CustomerApplicationRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         System.out.println("-------- ApplicationRunner ---------- ");
-        applicationContext.publishEvent(new CustomerEvent("ApplicationRunner"));
+        applicationContext.publishEvent(new CustomerEvent(this, "ApplicationRunner"));
     }
 }
