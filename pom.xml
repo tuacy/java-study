@@ -32,6 +32,7 @@
         <module>springboot</module>
         <module>license</module>
         <module>tableshard</module>
+        <module>logback</module>
     </modules>
 
     <!-- 公共的依赖，每个module对应依赖这些 -->

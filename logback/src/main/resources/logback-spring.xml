@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   说明：
+   1、日志级别及文件
+       日志记录采用分级记录，级别与日志文件名相对应，不同级别的日志信息记录到不同的日志文件中
+       例如：error级别记录到xxx-error-xxx.log（该文件为当前记录的日志文件），而xxx-error-xxx.x.log为归档日志，
+       日志文件按日期记录，同一天内，若日志文件大小等于或大于2M，则按0、1、2...顺序分别命名
+       例如xxx-error-2013-12-21.0.log
+       其它级别的日志也是如此。
+   2、文件路径
+       若本地开发，以绝对路径指定，如：/Users/zhangboqing/Downloads/logs。
+       若部署到服务器，则各个服务器约定一个固定的日志路径如/data/home/logs/【项目名】/
+   3、Appender
+       FILE-ALL对应所有级别，文件名以xxx-all-xxx.log形式命名
+       FILE-ERROR对应error级别，文件名以xxx-error-xxx.log形式命名
+       FILE-WARN对应warn级别，文件名以xxx-warn-xxx.log形式命名
+       FILE-INFO对应info级别，文件名以xxx-info-xxx.log形式命名
+       FILE-DEBUG对应debug级别，文件名以xxx-debug-xxx.log形式命名
+       STDOUT将日志信息输出到控制上，为方便开发测试使用
+-->
+
+<!--
+    根节点<configuration>，包含下面三个属性
+    1.scan: 当此属性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true。
+    2.scanPeriod: 设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。当scan为true时，此属性生效。默认的时间间隔为1分钟。
+    3.debug: 当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。
+-->
+
+<configuration scan="true" scanPeriod="10 seconds">
+
+    <!--
+        子节点<property name="" value=""> ：用来定义变量值，它有两个属性name和value，通过<property>定义的值会被插入到logger上下文中，可以使“${}”来使用变量。
+    -->
+    <!--
+        子节点<property resource=""/> ：用来引入外部属性文件，可以使“${}”来使用变量。
+    -->
+    <property name="APP_NAME" value="IoServer4J"/>
+    <property name="LOG_DIR" value="./logs/${APP_NAME}"/>
+
+    <property name="LOG_FILE_NAME" value="sys"/>
+    <property name="ERROR_LOG_FILE_NAME" value="error"/>
+    <property name="DB_LOG_FILE_NAME" value="db"/>
+
+    <property name="logFileNamePattern" value="${LOG_FILE_NAME}_%d{yyyy-MM-dd}_%i"/>
+    <property name="errorLogFileNamePattern" value="${ERROR_LOG_FILE_NAME}_%d{yyyy-MM-dd}_%i"/>
+    <property name="dbLogFileNamePattern" value="${DB_LOG_FILE_NAME}_%d{yyyy-MM-dd}_%i"/>
+
+    <!-- 注册转换器，颜色转化器 -->
+    <!-- 彩色日志依赖的渲染类 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+    <conversionRule conversionWord="wex"
+                    converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
+    <conversionRule conversionWord="wEx"
+                    converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+
+    <!-- 日志输出格式 -->
+    <property name="fileLayoutPattern"
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr([${APP_NAME:-},%X{X-B3-TraceId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}]){yellow} %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{60} Line:%-3L){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+
+    <!--
+        子节点<contextName>：用来设置上下文名称，每个logger都关联到logger上下文，默认上下文名称为default。但可以使用<contextName>设置成其他名字，用于区分不同应用程序的记录。一旦设置，不能修改。
+    -->
+    <contextName>${APP_NAME}</contextName>
+
+    <!--
+        子节点<appender>：负责写日志的组件，它有两个必要属性name和class。name指定appender名称，class指定appender的全限定名
+        class为ch.qos.logback.core.ConsoleAppender 把日志输出到控制台
+        class为ch.qos.logback.core.FileAppender 把日志添加到文件
+        class为ch.qos.logback.core.rolling.RollingFileAppender 滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件
+    -->
+
+    <!-- 控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>UTF-8</charset>
+            <pattern>${fileLayoutPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SYS_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${LOG_FILE_NAME}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/${logFileNamePattern}.log.zip
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>UTF-8</charset>
+            <pattern>${fileLayoutPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ERROR_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${ERROR_LOG_FILE_NAME}.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/${errorLogFileNamePattern}.log.zip
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory><!-- days -->
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>UTF-8</charset>
+            <pattern>${fileLayoutPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="DB_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${DB_LOG_FILE_NAME}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/${dbLogFileNamePattern}.log.zip
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory><!-- days -->
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>UTF-8</charset>
+            <pattern>${fileLayoutPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.springfromework.web" level="error" additivity="true">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="SYS_LOG"/>
+    </logger>
+
+    <!--
+	    子节点<logger>：用来设置某一个包或者具体的某一个类的日志打印级别，以及指定<appender>,
+		logger 仅有一个name属性，两个可选属性 level／additivity
+			name：用来指定受此logger约束的某一个包或者具体的某一个类。
+			level：用来设置打印级别，大小写无关，TRACE,DEBUG,INFO,WARE,ERROR,ALL和OFF,还有一个特俗值INHERITED
+					或者 同义词NULL，代表强制执行上级的级别。
+			additivity:是否向上级logger传递打印信息。默认是true。
+	-->
+
+    <!-- db/sql logger -->
+    <logger name="java.sql.Connection" level="warn" additivity="false">
+        <!--标识DB_LOG appender将会添加到这个logger。-->
+        <appender-ref ref="DB_LOG"/>
+    </logger>
+    <logger name="java.sql.PreparedStatement" level="warn" additivity="false">
+        <appender-ref ref="DB_LOG"/>
+    </logger>
+    <logger name="java.sql.Statement" level="warn" additivity="false">
+        <appender-ref ref="DB_LOG"/>
+    </logger>
+
+    <!-- sql -->
+    <logger name="com.pilot.ioserver.basic.biz.pbl.core.db.mapper" level="warn" additivity="true">
+        <!--<appender-ref ref="CONSOLE"/>-->
+        <appender-ref ref="DB_LOG"/>
+    </logger>
+
+    <!-- 生产环境下，将此级别配置为适合的级别，以免日志文件太多或影响程序性能 -->
+    <!--
+        <root>元素也是<logger>元素,logger。只有一个level属性。
+        root 元素配置根 logger。该元素有一个 level 属性。没有 name 属性，因为已经被命名为“root”
+        <root>可以包含零个或多个<appender-ref>元素,标识这个appender将会添加到这个logger。
+    -->
+    <root level="warn">
+        <!-- 控制台输出 -->
+        <appender-ref ref="CONSOLE"/>
+        <!-- 文件输出 -->
+        <appender-ref ref="SYS_LOG"/>
+        <appender-ref ref="ERROR_LOG"/>
+        <appender-ref ref="DB_LOG"/>
+    </root>
+</configuration>
