@@ -2,6 +2,10 @@
 .idea
 java-study.iml
 
+# common
+common/common.iml
+
+
 # nio module
 nio/nio.iml
 nio/target
