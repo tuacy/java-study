@@ -37,3 +37,7 @@ tableshard/target
 # logback
 logback/logback.iml
 logback/target
+
+# kafka
+kafka/kafka.iml
+kafka/target
