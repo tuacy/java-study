@@ -11,9 +11,12 @@ spring:
       retries: 0
       #producer可以用来缓存数据的内存大小。如果数据产生速度大于向broker发送的速度，producer会阻塞或者抛出异常，以“block.on.buffer.full”来表明。这项设置将和producer能够使用的总内存相关，但并不是一个硬性的限制，因为不是producer使用的所有内存都是用于缓存。一些额外的内存会用于压缩（如果引入压缩机制），同样还有一些用于维护请求。
       buffer-memory: 33554432
-      #key序列化方式
+      #指定消息key和消息体的编解码方式
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        interceptor:
+          classes: com.tuacy.kafka.product.interceptor.TimerInterceptor,com.tuacy.kafka.product.interceptor.CounterInterceptor
     #消费者的配置
     consumer:
       #Kafka中没有初始偏移或如果当前偏移在服务器上不再存在时,默认区最新 ，有三个选项 【latest, earliest, none】
@@ -22,9 +25,8 @@ spring:
       enable-auto-commit: true
       #自动提交的时间间隔
       auto-commit-interval: 100
-      #key的解码方式
+      #指定消息key和消息体的编解码方式
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      #value的解码方式
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      #在/usr/local/etc/kafka/consumer.properties中有配置
+      #指定默认消费者group id 在/usr/local/etc/kafka/consumer.properties中有配置
       group-id: group_3
