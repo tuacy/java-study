@@ -30,3 +30,11 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       #指定默认消费者group id 在/usr/local/etc/kafka/consumer.properties中有配置
       group-id: group_3
+
+kafka:
+  topic:
+    group-id: group_3
+    topic-name:
+      - test1
+      - topic2
+      - topic3
