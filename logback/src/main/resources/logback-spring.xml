@@ -54,8 +54,23 @@
                     converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
 
     <!-- 日志输出格式 -->
+    <!--
+    日志输出格式：
+        %d:             表示日期时间，
+        %5p:            级别从左显示5个字符宽度，
+        ${PID:- }:      pid
+        %15.20t:        线程名字(如果宽度不足15，左侧补空白；如果宽度超过20，从左侧截断)
+        %logger{50}:    表示logger名字最长50个字符，否则按照句点分割
+        %%-4L:          行号，保留后面四位字符宽度
+        %m:             日志消息
+        %n:             换行符
+        ${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}:
+-->
+    <property name="consoleLayoutPattern"
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.20t]){faint} %clr(%-40.40logger{60} Line:%-4L){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+
     <property name="fileLayoutPattern"
-              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr([${APP_NAME:-},%X{X-B3-TraceId:-},%X{X-B3-SpanId:-},%X{X-Span-Export:-}]){yellow} %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{60} Line:%-3L){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- [%15.20t] %-40.40logger{60} Line:%-4L : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
 
     <!--
         子节点<contextName>：用来设置上下文名称，每个logger都关联到logger上下文，默认上下文名称为default。但可以使用<contextName>设置成其他名字，用于区分不同应用程序的记录。一旦设置，不能修改。
@@ -73,7 +88,7 @@
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <charset>UTF-8</charset>
-            <pattern>${fileLayoutPattern}</pattern>
+            <pattern>${consoleLayoutPattern}</pattern>
         </encoder>
     </appender>
 
@@ -142,14 +157,13 @@
 	-->
 
     <!-- db/sql logger -->
-    <logger name="java.sql.Connection" level="warn" additivity="false">
-        <!--标识DB_LOG appender将会添加到这个logger。-->
+    <logger name="java.sql.Connection" level="warn" additivity="true">
         <appender-ref ref="DB_LOG"/>
     </logger>
-    <logger name="java.sql.PreparedStatement" level="warn" additivity="false">
+    <logger name="java.sql.PreparedStatement" level="warn" additivity="true">
         <appender-ref ref="DB_LOG"/>
     </logger>
-    <logger name="java.sql.Statement" level="warn" additivity="false">
+    <logger name="java.sql.Statement" level="warn" additivity="true">
         <appender-ref ref="DB_LOG"/>
     </logger>
 
@@ -170,7 +184,7 @@
         <appender-ref ref="CONSOLE"/>
         <!-- 文件输出 -->
         <appender-ref ref="SYS_LOG"/>
+        <!-- 错误日志 -->
         <appender-ref ref="ERROR_LOG"/>
-        <appender-ref ref="DB_LOG"/>
     </root>
 </configuration>
