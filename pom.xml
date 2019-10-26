@@ -71,6 +71,14 @@
             <version>1.16.16</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.4</version>
+        </dependency>
+
+
     </dependencies>
 
     <!-- 控制依赖库的版本 -->
