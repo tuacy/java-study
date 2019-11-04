@@ -15,17 +15,20 @@
 
     <dependencies>
 
+        <!-- 自动配置核心依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
 
+        <!-- 用于IDE配置文件自定义属性时候的智能提示 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
 
+        <!-- 需要的第三方库，注意这里设置只在编译器有效 -->
         <dependency>
             <groupId>com.tuacy</groupId>
             <artifactId>email</artifactId>

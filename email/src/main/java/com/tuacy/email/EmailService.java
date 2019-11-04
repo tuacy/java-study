@@ -1,4 +1,4 @@
-package com.tuacy.autoconfigure.email.service;
+package com.tuacy.email;
 
 public class EmailService {
 

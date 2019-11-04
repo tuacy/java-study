@@ -1,8 +1,7 @@
 package com.tuacy.autoconfigure.email.configure;
 
 import com.tuacy.autoconfigure.email.entity.EmailProperties;
-import com.tuacy.autoconfigure.email.service.EmailService;
-import com.tuacy.email.EmailMM;
+import com.tuacy.email.EmailService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -34,10 +33,4 @@ public class EmailAutoConfigure {
         return new EmailService(emailProperties.getSendEmail(), emailProperties.getSendPassword());
     }
 
-    @Bean
-    @ConditionalOnClass(EmailMM.class)
-    @ConditionalOnMissingBean
-    public EmailMM emailMM() {
-        return new EmailMM();
-    }
 }
