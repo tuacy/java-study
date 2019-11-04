@@ -35,6 +35,9 @@
         <module>logback</module>
         <module>common</module>
         <module>kafka</module>
+        <module>email-spring-boot-autoconfigure</module>
+        <module>email-spring-boot-starter</module>
+        <module>email</module>
     </modules>
 
     <!-- 公共的依赖，每个module对应依赖这些 -->

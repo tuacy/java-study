@@ -12,3 +12,6 @@ user:
   info:
     name: tuacy
     age: 27
+email:
+  send-email: 123@qq.com
+  send-password: 123456

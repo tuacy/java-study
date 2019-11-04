@@ -41,3 +41,15 @@ logback/target
 # kafka
 kafka/kafka.iml
 kafka/target
+
+# email-spring-boot-autoconfigure
+email-spring-boot-autoconfigure/email-spring-boot-autoconfigure.iml
+email-spring-boot-autoconfigure/target
+
+# email-spring-boot-starter
+email-spring-boot-starter/email-spring-boot-starter.iml
+email-spring-boot-starter/target
+
+# email
+email/email.iml
+email/target
