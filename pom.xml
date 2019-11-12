@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.5.RELEASE</version>
+        <version>2.2.1.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -38,6 +38,7 @@
         <module>email-spring-boot-autoconfigure</module>
         <module>email-spring-boot-starter</module>
         <module>email</module>
+        <module>redis</module>
     </modules>
 
     <!-- 公共的依赖，每个module对应依赖这些 -->

@@ -53,3 +53,7 @@ email-spring-boot-starter/target
 # email
 email/email.iml
 email/target
+
+# redis
+redis/redis.iml
+redis/target
