@@ -34,8 +34,8 @@ public class RedisSentinelController {
 
     @RequestMapping(value = "/setValue", method = RequestMethod.POST)
     public String sentinelGet(@RequestBody SetRedis param) {
-         stringRedisTemplate.opsForValue().set(param.getKey(), param.getValue());
-         return "success";
+        stringRedisTemplate.opsForValue().set(param.getKey(), param.getValue());
+        return "success";
     }
 
 }

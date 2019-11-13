@@ -8,6 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisNode;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.HashSet;
@@ -52,5 +55,30 @@ public class RedisSentinelConfig {
     @Bean
     public JedisConnectionFactory jedisConnectionFactory(JedisPoolConfig jedisPoolConfig, RedisSentinelConfiguration sentinelConfig) {
         return new JedisConnectionFactory(sentinelConfig, jedisPoolConfig);
+    }
+
+    @Bean
+    public RedisTemplate<Object, Object> redisTemplate() {
+        //StringRedisTemplate的构造方法中默认设置了stringSerializer
+        RedisTemplate<Object, Object> template = new RedisTemplate<>();
+        //设置开启事务
+        template.setEnableTransactionSupport(true);
+        //set key serializer
+        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+        template.setKeySerializer(stringRedisSerializer);
+        template.setHashKeySerializer(stringRedisSerializer);
+
+        template.setConnectionFactory(jedisConnectionFactory(getRedisConfig(), sentinelConfiguration()));
+        template.afterPropertiesSet();
+        template.setEnableTransactionSupport(true); //开启 @Transactional 支持
+        return template;
+    }
+
+    @Bean
+    public StringRedisTemplate stringRedisTemplate(JedisConnectionFactory jedisConnectionFactory) {
+        StringRedisTemplate template = new StringRedisTemplate();
+        template.setConnectionFactory(jedisConnectionFactory);
+        template.setEnableTransactionSupport(true); //开启 @Transactional 支持
+        return template;
     }
 }
