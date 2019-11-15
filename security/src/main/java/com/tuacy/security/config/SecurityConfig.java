@@ -1,12 +1,12 @@
 package com.tuacy.security.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
  * @name: SecurityConfig
@@ -17,10 +17,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  */
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private AuthenticationProvider provider;  //注入我们自己的AuthenticationProvider
+    @Override
+    protected UserDetailsService userDetailsService() {
+        return super.userDetailsService();
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -29,12 +32,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(provider);
-//        super.configure(auth);
-//        auth.inMemoryAuthentication()
-//                .withUser("admin").password("123456").roles("USER")
-//                .and()
-//                .withUser("test").password("test123").roles("ADMIN");
+        auth
+                .inMemoryAuthentication()
+                .withUser("root")
+                .password("root")
+                .roles("USER");
     }
 
 
