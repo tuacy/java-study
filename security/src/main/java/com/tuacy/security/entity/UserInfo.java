@@ -2,9 +2,11 @@ package com.tuacy.security.entity;
 
 import com.google.common.collect.Lists;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @name: UserInfo
@@ -17,13 +19,26 @@ public class UserInfo implements UserDetails {
 
     private String userName;
     private String password;
+    private List<RoleInfo> roleList;
+
+    public List<RoleInfo> getRoleList() {
+        return roleList;
+    }
+
+    public void setRoleList(List<RoleInfo> roleList) {
+        this.roleList = roleList;
+    }
 
     /**
      * 返回授予用户的权限
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Lists.newArrayList();
+        List<GrantedAuthority> authorities = Lists.newArrayList();
+        if (roleList != null) {
+            roleList.forEach(roleInfo -> authorities.add(new SimpleGrantedAuthority(roleInfo.getName())));
+        }
+        return authorities;
     }
 
     @Override
