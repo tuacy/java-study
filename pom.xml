@@ -40,6 +40,7 @@
         <module>email</module>
         <module>redis</module>
         <module>security</module>
+        <module>excel</module>
     </modules>
 
     <!-- 公共的依赖，每个module对应依赖这些 -->
