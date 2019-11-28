@@ -1,7 +1,9 @@
 package com.tuacy.security;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 
 /**
  * @name: SecurityApplication
@@ -11,6 +13,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @Description:
  */
 @SpringBootApplication
+@EnableCaching
+@MapperScan(basePackages = "com.tuacy.security.mapper")
 public class SecurityApplication {
 
     public static void main(String[] args) {
