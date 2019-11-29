@@ -63,13 +63,21 @@ public class CacheManagerConfig {
      * @see RedisCacheCustomizer#customize(RedisCacheManager)
      */
     public interface CacheNames {
-        /** 15分钟缓存组 */
+        /**
+         * 15分钟缓存组
+         */
         String CACHE_15MINS = "cp_salary:cache:15m";
-        /** 30分钟缓存组 */
+        /**
+         * 30分钟缓存组
+         */
         String CACHE_30MINS = "cp_salary:cache:30m";
-        /** 60分钟缓存组 */
+        /**
+         * 60分钟缓存组
+         */
         String CACHE_60MINS = "cp_salary:cache:60m";
-        /** 180分钟缓存组 */
+        /**
+         * 180分钟缓存组
+         */
         String CACHE_180MINS = "cp_salary:cache:180m";
     }
 
@@ -87,36 +95,39 @@ public class CacheManagerConfig {
 
     /**
      * 默认的redisCacheManager
+     *
      * @param factory 通过参数注入，这里没有手动给它做配置。在引入了redis的jar包，并且往
-     * application.yml里添加了spring.redis的配置项，springboot的autoconfig会自动生成一个
-     * redisTemplate的bean
+     *                application.yml里添加了spring.redis的配置项，springboot的autoconfig会自动生成一个
+     *                redisTemplate的bean
      */
 
     @Primary
     @Bean
     public RedisCacheManager redisCacheManager(RedisConnectionFactory factory) {
-        RedisCacheManager cacheManager = RedisCacheManager.create(factory);
-        return cacheManager;
+        return RedisCacheManager.create(factory);
     }
 
 
     @Bean
-    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory){
+    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {
         StringRedisTemplate template = new StringRedisTemplate(factory);
         setSerializer(template);//设置序列化工具
         template.afterPropertiesSet();
         return template;
     }
 
-    /** cache的一些自定义配置 */
+    /**
+     * cache的一些自定义配置
+     */
     @Bean
     public RedisCacheCustomizer redisCacheManagerCustomizer() {
         return new RedisCacheCustomizer();
     }
 
-    private static class RedisCacheCustomizer
-            implements CacheManagerCustomizer<RedisCacheManager> {
-        /** CacheManager缓存自定义初始化比较早，尽量不要@autowired 其他spring 组件 */
+    private static class RedisCacheCustomizer implements CacheManagerCustomizer<RedisCacheManager> {
+        /**
+         * CacheManager缓存自定义初始化比较早，尽量不要@autowired 其他spring 组件
+         */
         @Override
         public void customize(RedisCacheManager cacheManager) {
             // 自定义缓存名对应的过期时间
@@ -144,8 +155,8 @@ public class CacheManagerConfig {
         return new EhCacheCacheManager(EhCacheManagerUtils.buildCacheManager(location));
     }
 
-    private void setSerializer(StringRedisTemplate template){
-        @SuppressWarnings({ "rawtypes", "unchecked" })
+    private void setSerializer(StringRedisTemplate template) {
+        @SuppressWarnings({"rawtypes", "unchecked"})
         Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
         ObjectMapper om = new ObjectMapper();
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
