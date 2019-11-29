@@ -1,0 +1,37 @@
+server:
+  port: 8093
+spring:
+  application:
+    name: security
+  thymeleaf:
+    encoding: UTF-8
+    cache: false
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/tuacydev?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=UTC
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 使用druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+  redis:
+    # 单机模式
+    host: 127.0.0.1 #哨兵模式下不用配置
+    port: 6380 # 哨兵模式下不用配置
+    jedis:
+      pool:
+        #最大连接数
+        max-active: 1024
+        #最大阻塞等待时间(负数表示没限制)
+        max-wait: 20000
+        #最大空闲
+        max-idle: 200
+        #最小空闲
+        min-idle: 10
+  cache:
+    type: ehcache
+    ehcache:
+      config: ehcache.xml
+
+mybatis:
+  typeAliasesPackage: com.tuacy.security.entity.model
+  mapperLocations: classpath:mapper/*.xml

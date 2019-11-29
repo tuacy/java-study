@@ -24,3 +24,4 @@ public class EmailProperties {
         this.sendPassword = sendPassword;
     }
 }
+
