@@ -1,11 +1,12 @@
 package com.tuacy.security.config;
 
 import com.tuacy.security.extend.CustomTokenEnhancer;
+import com.tuacy.security.extend.SMSCodeTokenGranter;
+import com.tuacy.security.service.SMSRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,7 +29,6 @@ import org.springframework.security.oauth2.provider.refresh.RefreshTokenGranter;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.*;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 
 import javax.sql.DataSource;
@@ -52,6 +52,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     private DataSource dataSource;
     private RedisConnectionFactory redisConnectionFactory;
     private UserDetailsService userDetailsService;
+    private SMSRecordService smsRecordService;
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
@@ -73,6 +74,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         this.userDetailsService = userDetailsService;
     }
 
+    @Autowired
+    public void setSmsRecordService(SMSRecordService smsRecordService) {
+        this.smsRecordService = smsRecordService;
+    }
+
     /**
      * 声明 ClientDetails实现 -- JdbcClientDetailsService实现
      */
@@ -89,11 +95,14 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         return new RedisTokenStore(redisConnectionFactory);
     }
 
+    /**
+     * AccessToken转换器-定义token的生成方式
+     * 对称加密方式
+     */
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
         JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(new ClassPathResource("authorizationKey.jks"), "123456".toCharArray());
-        converter.setKeyPair(keyStoreKeyFactory.getKeyPair("klw"));
+        converter.setSigningKey("123");
         return converter;
     }
 
@@ -160,6 +169,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .tokenGranter(tokenGranter())
                 //启用oauth2管理
                 .authenticationManager(authenticationManager)
+                // 告诉spring security token的生成方式
+                .accessTokenConverter(accessTokenConverter())
                 //接收GET和POST
                 .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
 
@@ -194,6 +205,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         if (authenticationManager != null) {
             tokenGranters.add(new ResourceOwnerPasswordTokenGranter(authenticationManager, tokenServices, clientDetails, requestFactory));
         }
+        // 增加一种验证码的认证模式
+        tokenGranters.add(new SMSCodeTokenGranter(tokenServices, clientDetails, requestFactory, userDetailsService, smsRecordService));
         return tokenGranters;
     }
 

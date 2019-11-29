@@ -1,8 +1,9 @@
-package com.tuacy.security.service;
+package com.tuacy.security.service.impl;
 
 import com.google.common.collect.Lists;
 import com.tuacy.security.entity.AuthUserDetailBo;
 import com.tuacy.security.entity.model.UserInfoPo;
+import com.tuacy.security.service.UserManageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

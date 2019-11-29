@@ -12,7 +12,7 @@ public interface SMSRecordService {
     /**
      * 保存验证码
      */
-    void saveSMSCode(String userName, String smsCode);
+    String saveSMSCode(String userName, String smsCode);
 
     /**
      * 获取验证码

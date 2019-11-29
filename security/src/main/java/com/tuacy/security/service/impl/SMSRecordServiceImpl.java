@@ -19,23 +19,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class SMSRecordServiceImpl implements SMSRecordService {
 
-    @CachePut()
+    @CachePut(key = "#userName")
     @Override
-    public void saveSMSCode(String userName, String smsCode) {
-
+    public String saveSMSCode(String userName, String smsCode) {
+        return smsCode;
     }
 
     /**
      * Cacheable 注解会先查询是否已经有缓存，有会使用缓存，没有则会执行方法并缓存
      * 如果没有指定key则默认使用参数作为key
      */
-    @Cacheable()
+    @Cacheable(key = "#userName")
     @Override
     public String getSMSCode(String userName) {
         return null;
     }
 
-    @CacheEvict(beforeInvocation = true)
+    @CacheEvict(key = "#userName", beforeInvocation = true)
     @Override
     public void clearSMSCode(String userName) {
 

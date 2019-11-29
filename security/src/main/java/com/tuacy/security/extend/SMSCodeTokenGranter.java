@@ -1,14 +1,22 @@
 package com.tuacy.security.extend;
 
+import com.google.common.collect.Lists;
+import com.tuacy.security.entity.AuthUserDetailBo;
+import com.tuacy.security.entity.model.UserInfoPo;
+import com.tuacy.security.service.SMSRecordService;
+import com.tuacy.security.service.UserManageService;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.common.exceptions.InvalidGrantException;
 import org.springframework.security.oauth2.provider.*;
 import org.springframework.security.oauth2.provider.token.AbstractTokenGranter;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -17,15 +25,23 @@ import java.util.Map;
  * @author: tuacy.
  * @date: 2019/11/28.
  * @version: 1.0
- * @Description: 验证码认证模式
+ * @Description: 验证码认证模式 (oath2之前是有四种验证模式:授权码模式,简化模式,密码模式,客户端模式)
  */
 public class SMSCodeTokenGranter extends AbstractTokenGranter {
 
     private static final String GRANT_TYPE = "sms_code";
 
+    private SMSRecordService smsRecordService;
+    private UserDetailsService userManageService;
+
     public SMSCodeTokenGranter(AuthorizationServerTokenServices tokenServices,
-                                    ClientDetailsService clientDetailsService, OAuth2RequestFactory requestFactory) {
+                               ClientDetailsService clientDetailsService,
+                               OAuth2RequestFactory requestFactory,
+                               UserDetailsService userDetailsService,
+                               SMSRecordService smsRecordService) {
         super(tokenServices, clientDetailsService, requestFactory, GRANT_TYPE);
+        this.smsRecordService = smsRecordService;
+        this.userManageService = userDetailsService;
     }
 
     @Override
@@ -33,26 +49,27 @@ public class SMSCodeTokenGranter extends AbstractTokenGranter {
                                                            TokenRequest tokenRequest) {
 
         Map<String, String> parameters = new LinkedHashMap<String, String>(tokenRequest.getRequestParameters());
-        String userMobileNo = parameters.get("username");  //客户端提交的用户名
+        String userName = parameters.get("username");  //客户端提交的用户名
         String smsCode = parameters.get("smscode");  //客户端提交的验证码
 
         // 从库里查用户
-        UserDetails user = 从库里查找用户的代码略;
+        UserDetails user = userManageService.loadUserByUsername(userName);
         if (user == null) {
             throw new InvalidGrantException("用户不存在");
         }
 
-        验证用户状态(是否警用等), 代码略
+        // 验证用户状态(是否警用等), 代码略
 
         // 验证验证码,从缓存中查找验证码
-        String smsCodeCached = 获取服务中保存的用户验证码, 代码略.一般我们是在生成好后放到缓存中
-        if (StringUtils.isBlank(smsCodeCached)) {
+        String smsCodeCached = smsRecordService.getSMSCode(userName);
+        if (smsCodeCached == null || smsCodeCached.isEmpty()) {
             throw new InvalidGrantException("用户没有发送验证码");
         }
         if (!smsCode.equals(smsCodeCached)) {
             throw new InvalidGrantException("验证码不正确");
         } else {
-            验证通过后从缓存中移除验证码, 代码略
+            // 验证通过后从缓存中移除验证码, 代码略
+            smsRecordService.clearSMSCode(userName);
         }
 
 

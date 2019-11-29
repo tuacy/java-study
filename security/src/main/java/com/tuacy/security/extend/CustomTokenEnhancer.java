@@ -14,7 +14,7 @@ import java.util.Map;
  * @author: tuacy.
  * @date: 2019/11/28.
  * @version: 1.0
- * @Description: 令牌增强器,可以添加一些往外的嘻嘻
+ * @Description: 令牌增强器, 向jwt中添加额外信息
  */
 public class CustomTokenEnhancer implements TokenEnhancer {
     @Override
