@@ -15,6 +15,6 @@ public interface UserManageMapper {
     /**
      * 根据用户名获取用户信息
      */
-    UserInfoPo findUserInfoByName(@Param("userName") String userName);
+    UserInfoPo loadUserByUsername(@Param("userName") String userName);
 
 }

@@ -30,9 +30,9 @@ import java.util.concurrent.TimeUnit;
  * @version: 1.0
  * @Description:
  */
-@Configuration
-@EnableCaching
-@EnableConfigurationProperties(CacheProperties.class)
+//@Configuration
+//@EnableCaching
+//@EnableConfigurationProperties(CacheProperties.class)
 public class CacheManagerConfig {
 
     private final CacheProperties cacheProperties;

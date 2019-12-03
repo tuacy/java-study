@@ -25,6 +25,6 @@ public class UserManageServiceImpl implements UserManageService {
 
     @Override
     public UserInfoPo getUserInfo(String userName) {
-        return userManageMapper.findUserInfoByName(userName);
+        return userManageMapper.loadUserByUsername(userName);
     }
 }

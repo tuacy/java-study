@@ -13,8 +13,8 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
  * @version: 1.0
  * @Description:
  */
-@Configuration
-@EnableResourceServer
+//@Configuration
+//@EnableResourceServer
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     private static final String RESOURCE_IDS = "order";

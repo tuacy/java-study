@@ -44,8 +44,8 @@ import java.util.concurrent.TimeUnit;
  * @version: 1.0
  * @Description: OAuth2认证授权服务配置
  */
-@Configuration
-@EnableAuthorizationServer
+//@Configuration
+//@EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
     private AuthenticationManager authenticationManager;

@@ -47,13 +47,13 @@
     -->
 
     <!-- 根据用户名获取用户信息 -->
-    <select id="findUserInfoByName" resultType="com.tuacy.security.entity.model.UserInfoPo">
+    <select id="loadUserByUsername" resultType="com.tuacy.security.entity.model.UserInfoPo">
         SELECT
             `id` as userId,
-            `name` as userName,
+            `username` as userName,
             `password` as password
         FROM
-            user_info ui
-        WHERE  `name` = #{userName}
+            `user` ui
+        WHERE  `username` = #{userName}
     </select>
 </mapper>
