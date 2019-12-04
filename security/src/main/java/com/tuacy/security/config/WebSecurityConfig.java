@@ -31,22 +31,23 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 
-        //校验用户
-        auth.userDetailsService(userService).passwordEncoder(new PasswordEncoder() {
-            //对密码进行加密
-            @Override
-            public String encode(CharSequence charSequence) {
-                System.out.println(charSequence.toString());
-                return DigestUtils.md5DigestAsHex(charSequence.toString().getBytes());
-            }
+        //校验用户 userDetailsService验证用户
+        auth.userDetailsService(userService)
+                .passwordEncoder(new PasswordEncoder() {
+                    //对密码进行加密
+                    @Override
+                    public String encode(CharSequence charSequence) {
+                        System.out.println(charSequence.toString());
+                        return DigestUtils.md5DigestAsHex(charSequence.toString().getBytes());
+                    }
 
-            //对密码进行判断匹配
-            @Override
-            public boolean matches(CharSequence charSequence, String s) {
-                String encode = DigestUtils.md5DigestAsHex(charSequence.toString().getBytes());
-                return s.equals(encode);
-            }
-        });
+                    //对密码进行判断匹配
+                    @Override
+                    public boolean matches(CharSequence charSequence, String s) {
+                        String encode = DigestUtils.md5DigestAsHex(charSequence.toString().getBytes());
+                        return s.equals(encode);
+                    }
+                });
 
     }
 

@@ -81,10 +81,10 @@ public class CustomInvocationSecurityMetadataSourceService implements FilterInvo
             map = new HashMap<>(16);
         }
         //权限资源 和 角色对应的表  也就是 角色权限 中间表
-        List<RolePermisson> rolePermissons = permissionMapper.getRolePermissions();
+        List<RolePermisson> rolePermissonList = permissionMapper.getRolePermissions();
 
         //某个资源 可以被哪些角色访问
-        for (RolePermisson rolePermisson : rolePermissons) {
+        for (RolePermisson rolePermisson : rolePermissonList) {
 
             String url = rolePermisson.getUrl();
             String roleName = rolePermisson.getRoleName();

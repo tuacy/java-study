@@ -1,7 +1,5 @@
 package com.tuacy.security.security;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
@@ -25,20 +23,16 @@ import java.util.Collection;
 @Component
 public class CustomAccessDecisionManager implements AccessDecisionManager {
 
-    private final static Logger logger = LoggerFactory.getLogger(CustomAccessDecisionManager.class);
-
     /**
-     * 通过传递的参数来决定用户是否有访问对应受保护对象的权限
+     * 通过传递的参数来决定用户是否有访问对应受保护对象的权限(判定是否拥有权限的决策方法)
      *
      * @param authentication   包含了当前的用户信息，包括拥有的权限。这里的权限来源就是前面登录时UserDetailsService中设置的authorities。
-     * @param object           就是FilterInvocation对象，可以得到request等web资源
-     * @param configAttributes configAttributes是本次访问需要的权限
+     * @param object           包含客户端发起的请求的request信息，可转换为 HttpServletRequest request = ((FilterInvocation) object).getHttpRequest()
+     * @param configAttributes configAttributes是本次访问需要的权限,为MyInvocationSecurityMetadataSource的getAttributes(Object object)这个方法返回的结果，此方法是为了判定用户请求的url 是否在权限表中，如果在权限表中，则返回给 decide 方法，用来判定用户是否有此权限。如果不在权限表中则放行。
      */
     @Override
     public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes) throws AccessDeniedException, InsufficientAuthenticationException {
-        if (null == configAttributes || 0 >= configAttributes.size()) {
-            return;
-        } else {
+        if (null != configAttributes && !configAttributes.isEmpty()) {
             String needRole;
             for (ConfigAttribute configAttribute : configAttributes) {
                 needRole = configAttribute.getAttribute();
