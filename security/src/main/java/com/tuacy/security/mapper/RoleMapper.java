@@ -1,6 +1,7 @@
 package com.tuacy.security.mapper;
 
 import com.tuacy.security.entity.model.RoleDetailBo;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
  * @version: 1.0
  * @Description:
  */
+@Mapper
 public interface RoleMapper {
 
     List<RoleDetailBo> getRolesByUserId(@Param("userId") Long userId);

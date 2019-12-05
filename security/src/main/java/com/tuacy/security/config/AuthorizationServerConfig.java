@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,6 +31,9 @@ import org.springframework.security.oauth2.provider.request.DefaultOAuth2Request
 import org.springframework.security.oauth2.provider.token.*;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -44,15 +48,25 @@ import java.util.concurrent.TimeUnit;
  * @version: 1.0
  * @Description: OAuth2认证授权服务配置
  */
-//@Configuration
-//@EnableAuthorizationServer
+@Configuration
+@EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
+    /**
+     * 注入权限验证控制器 来支持 password grant type
+     */
     private AuthenticationManager authenticationManager;
+    /**
+     * 数据源
+     */
     private DataSource dataSource;
     private RedisConnectionFactory redisConnectionFactory;
+    /**
+     * 注入userDetailsService，开启refresh_token需要用到
+     */
     private UserDetailsService userDetailsService;
     private SMSRecordService smsRecordService;
+//    private WebResponseExceptionTranslator webResponseExceptionTranslator;
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
@@ -79,6 +93,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         this.smsRecordService = smsRecordService;
     }
 
+//    @Autowired
+//    public void setWebResponseExceptionTranslator(WebResponseExceptionTranslator webResponseExceptionTranslator) {
+//        this.webResponseExceptionTranslator = webResponseExceptionTranslator;
+//    }
+
     /**
      * 声明 ClientDetails实现 -- JdbcClientDetailsService实现
      */
@@ -88,16 +107,16 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     }
 
     /**
-     * 声明TokenStore实现 -- RedisTokenStore
+     * 设置保存token的方式，一共有五种，Redis的方式
      */
     @Bean
     public TokenStore tokenStore() {
         return new RedisTokenStore(redisConnectionFactory);
+//        return new JwtTokenStore(accessTokenConverter());
     }
 
     /**
-     * AccessToken转换器-定义token的生成方式
-     * 对称加密方式
+     * AccessToken转换器-定义token的生成方式，这里使用JWT生成token，对称加密只需要加入key等其他信息（自定义）
      */
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
@@ -122,12 +141,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         tokenServices.setSupportRefreshToken(true);
         //不重复使用refresh_token,每交刷新完后，更新这个值
         tokenServices.setReuseRefreshToken(false);
-        tokenServices.setClientDetailsService(clientDetails());
         tokenServices.setTokenEnhancer(tokenEnhancer());   // 如果没有设置它,JWT就失效了.
-        // token有效期
-        tokenServices.setAccessTokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(30)); // 30天
-        // 默认30天，这里修改60天
-        tokenServices.setRefreshTokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(60)); // 60天
+        // token有效期, 30分钟
+        tokenServices.setAccessTokenValiditySeconds((int) TimeUnit.MINUTES.toSeconds(30));
+        // 默认30天，60分钟
+        tokenServices.setRefreshTokenValiditySeconds((int) TimeUnit.MINUTES.toSeconds(60));
         return tokenServices;
     }
 
@@ -137,12 +155,24 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
         super.configure(security);
-        security
-                // 开启/oauth/token_key验证端口无权限访问
-                .tokenKeyAccess("permitAll()")
-                // 开启/oauth/check_token验证端口认证权限访问
-                .checkTokenAccess("isAuthenticated()")
-                .allowFormAuthenticationForClients();
+
+        /**
+         * 配置oauth2服务跨域
+         */
+        CorsConfigurationSource source = request -> {
+            CorsConfiguration corsConfiguration = new CorsConfiguration();
+            corsConfiguration.addAllowedHeader("*");
+            corsConfiguration.addAllowedOrigin(request.getHeader(HttpHeaders.ORIGIN));
+            corsConfiguration.addAllowedMethod("*");
+            corsConfiguration.setAllowCredentials(true);
+            corsConfiguration.setMaxAge(3600L);
+            return corsConfiguration;
+        };
+
+        security.tokenKeyAccess("permitAll()")
+                .checkTokenAccess("permitAll()")
+                .allowFormAuthenticationForClients()
+                .addTokenEndpointAuthenticationFilter(new CorsFilter(source));
     }
 
     /**
@@ -162,17 +192,19 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         super.configure(endpoints);
         endpoints
-                //用户管理, refresh_token 需要配制它,否则会 UserDetailsService is required
+                //要使用refresh_token的话，需要额外配置userDetailsService
                 .userDetailsService(userDetailsService)
                 //token存到redis
                 .tokenStore(tokenStore())
                 .tokenGranter(tokenGranter())
-                //启用oauth2管理
+                //开启密码授权类型
                 .authenticationManager(authenticationManager)
                 // 告诉spring security token的生成方式
                 .accessTokenConverter(accessTokenConverter())
                 //接收GET和POST
                 .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
+        //自定义登录或者鉴权失败时的返回信息
+//                .exceptionTranslator(webResponseExceptionTranslator);
 
 
         endpoints.tokenServices(tokenServices());
@@ -210,6 +242,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         return tokenGranters;
     }
 
+    /**
+     * 多增加一种授权模式（oath2之前是有四种验证模式:授权码模式,简化模式,密码模式,客户端模式），比如我们添加一个短信验证码的认知模式
+     */
     private TokenGranter tokenGranter() {
         return new TokenGranter() {
             private CompositeTokenGranter delegate;

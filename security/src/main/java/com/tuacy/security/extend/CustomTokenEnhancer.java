@@ -22,7 +22,7 @@ public class CustomTokenEnhancer implements TokenEnhancer {
         User user = (User) authentication.getPrincipal();
         final Map<String, Object> additionalInfo = new HashMap<>();
 
-        additionalInfo.put("customInfo", "some_stuff_here");
+        additionalInfo.put("author_name", "tuacy");
         // 注意添加的额外信息，最好不要和已有的json对象中的key重名，容易出现错误
         //additionalInfo.put("authorities", user.getAuthorities());
 

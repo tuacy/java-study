@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
-import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 
 /**
  * @name: ResourceServerConfig
@@ -13,23 +12,21 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
  * @version: 1.0
  * @Description:
  */
-//@Configuration
-//@EnableResourceServer
+@Configuration
+@EnableResourceServer
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
-    private static final String RESOURCE_IDS = "order";
-
+    /**
+     * 这里设置需要token验证的url
+     * 这些url需要在WebSecurityConfigurerAdapter中排掉
+     * 否则进入WebSecurityConfigurerAdapter,进行的是basic auth或表单认证,而不是token认证
+     */
     @Override
-    public void configure(ResourceServerSecurityConfigurer resources) {
-        resources.resourceId(RESOURCE_IDS).stateless(true);
-    }
-
-    @Override
-    public void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
+    public void configure(HttpSecurity http) throws Exception {
+        http.requestMatchers().antMatchers("/hi")
+                .and()
                 .authorizeRequests()
-                .antMatchers("/order/**").authenticated();      //配置order访问控制，必须认证过后才可以访问
-
+                .antMatchers("/hi").authenticated();
     }
 
 }

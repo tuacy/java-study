@@ -2,13 +2,17 @@ package com.tuacy.security.config;
 
 import com.tuacy.security.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.DigestUtils;
+
+import java.util.Objects;
 
 /**
  * @name: WebSecurityConfig
@@ -53,36 +57,39 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/", "index", "/login", "/login-error", "/401", "/css/**", "/js/**").permitAll()
-                .anyRequest().authenticated()
+        http.csrf().disable();
+        http.requestMatchers()
+                .antMatchers("/oauth/**", "/login", "/login-error")
                 .and()
-                .formLogin().loginPage("/login").failureUrl("/login-error")
+                .authorizeRequests()
+                .antMatchers("/oauth/**").authenticated()
                 .and()
-                .exceptionHandling().accessDeniedPage("/401");
-        http.logout().logoutSuccessUrl("/");
+                .formLogin().loginPage("/login").failureUrl("/login-error");
     }
 
 
-//    /**
-//     * 注入AuthenticationManager接口，启用OAuth2密码模式
-//     */
-//    @Bean
-//    @Override
-//    public AuthenticationManager authenticationManagerBean() throws Exception {
-//        return super.authenticationManagerBean();
-//    }
-//
-//    /**
-//     * 通过HttpSecurity实现Security的自定义过滤配置
-//     */
-//    @Override
-//    protected void configure(HttpSecurity httpSecurity) throws Exception {
-//        httpSecurity
-//                .requestMatchers().anyRequest()
-//                .and()
-//                .authorizeRequests()
-//                .antMatchers("/oauth/**").permitAll();
-//    }
+    /**
+     * 注入AuthenticationManager接口，启用OAuth2密码模式
+     */
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new PasswordEncoder() {
+            @Override
+            public String encode(CharSequence charSequence) {
+                return charSequence.toString();
+            }
+
+            @Override
+            public boolean matches(CharSequence charSequence, String s) {
+                return Objects.equals(charSequence.toString(), s);
+            }
+        };
+    }
 
 }
