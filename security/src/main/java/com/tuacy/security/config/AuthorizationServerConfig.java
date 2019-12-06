@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,13 +28,13 @@ import org.springframework.security.oauth2.provider.password.ResourceOwnerPasswo
 import org.springframework.security.oauth2.provider.refresh.RefreshTokenGranter;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.*;
-import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -59,7 +58,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      * 数据源
      */
     private DataSource dataSource;
-    private RedisConnectionFactory redisConnectionFactory;
+    private TokenStore tokenStore;
+    private AccessTokenConverter accessTokenConverter;
     /**
      * 注入userDetailsService，开启refresh_token需要用到
      */
@@ -73,13 +73,18 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     }
 
     @Autowired
-    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
+    public void setTokenStore(TokenStore tokenStore) {
+        this.tokenStore = tokenStore;
     }
 
     @Autowired
-    public void setRedisConnectionFactory(RedisConnectionFactory redisConnectionFactory) {
-        this.redisConnectionFactory = redisConnectionFactory;
+    public void setAccessTokenConverter(AccessTokenConverter accessTokenConverter) {
+        this.accessTokenConverter = accessTokenConverter;
+    }
+
+    @Autowired
+    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
     }
 
     @Autowired
@@ -105,29 +110,14 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         return new JdbcClientDetailsService(dataSource);
     }
 
-    /**
-     * 设置保存token的方式，一共有五种，Redis的方式
-     */
-    @Bean
-    public TokenStore tokenStore() {
-        return new RedisTokenStore(redisConnectionFactory);
-//        return new JwtTokenStore(accessTokenConverter());
-    }
-
-//    /**
-//     * AccessToken转换器-定义token的生成方式，这里使用JWT生成token，对称加密只需要加入key等其他信息（自定义）
-//     */
-//    @Bean
-//    public JwtAccessTokenConverter accessTokenConverter() {
-//        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-//        converter.setSigningKey("123");
-//        return converter;
-//    }
-
     @Bean
     public TokenEnhancer tokenEnhancer() {
         TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
-        tokenEnhancerChain.setTokenEnhancers(Collections.singletonList(new CustomTokenEnhancer()));
+        if (accessTokenConverter instanceof TokenEnhancer) {
+            tokenEnhancerChain.setTokenEnhancers(Arrays.asList(new CustomTokenEnhancer(), (TokenEnhancer) accessTokenConverter));
+        } else {
+            tokenEnhancerChain.setTokenEnhancers(Collections.singletonList(new CustomTokenEnhancer()));
+        }
         return tokenEnhancerChain;
     }
 
@@ -135,7 +125,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Bean
     public AuthorizationServerTokenServices tokenServices() {
         DefaultTokenServices tokenServices = new DefaultTokenServices();
-        tokenServices.setTokenStore(tokenStore());
+        tokenServices.setTokenStore(tokenStore);
         // 支持使用refresh_token
         tokenServices.setSupportRefreshToken(true);
         //不重复使用refresh_token,每交刷新完后，更新这个值
@@ -194,12 +184,12 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 //要使用refresh_token的话，需要额外配置userDetailsService
                 .userDetailsService(userDetailsService)
                 //token存到redis
-                .tokenStore(tokenStore())
+                .tokenStore(tokenStore)
                 .tokenGranter(tokenGranter())
                 //开启密码授权类型
                 .authenticationManager(authenticationManager)
                 // 告诉spring security token的生成方式
-//                .accessTokenConverter(accessTokenConverter())
+                .accessTokenConverter(accessTokenConverter)
                 //接收GET和POST
                 .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
         //自定义登录或者鉴权失败时的返回信息

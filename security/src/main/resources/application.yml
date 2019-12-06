@@ -11,7 +11,7 @@ spring:
     #开发配置为false,避免修改模板还要重启服务器
     cache: false
     #配置模板路径，默认是templates，可以不用配置
-#    prefix: classpath:/templates
+    #    prefix: classpath:/templates
     suffix: .html
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/tuacydev?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=UTC
@@ -39,6 +39,16 @@ spring:
 #    ehcache:
 #      config: classpath:ehcache.xml
 
+  security:
+    oauth2:
+      resource:
+        id: basic-system
+        user-info-uri: http://192.168.1.101:8000/auth-service/user
+        prefer-token-info: false
+
 mybatis:
   typeAliasesPackage: com.tuacy.security.entity.model
   mapperLocations: classpath:mapper/*.xml
+
+token-store:
+  type: jdbc # redis、jdbc、jwt、memory

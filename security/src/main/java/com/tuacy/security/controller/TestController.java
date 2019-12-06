@@ -1,7 +1,12 @@
 package com.tuacy.security.controller;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @name: TestController
@@ -12,8 +17,22 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class TestController {
-    @GetMapping("/hi")
-    public String hi(String name) {
-        return "hi , " + name;
+
+    @GetMapping("/redisOauth")
+    public String redisOauth(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        return "ok";
     }
+
+
+    @GetMapping("/jwtOauth")
+    public String jwtOauth(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        Claims body = Jwts.parser().setSigningKey("123".getBytes(StandardCharsets.UTF_8))
+                .parseClaimsJws(token).getBody();
+
+        String username = (String) body.get("username");
+        return "ok";
+    }
+
 }
