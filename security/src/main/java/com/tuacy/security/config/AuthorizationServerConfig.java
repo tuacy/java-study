@@ -29,7 +29,6 @@ import org.springframework.security.oauth2.provider.password.ResourceOwnerPasswo
 import org.springframework.security.oauth2.provider.refresh.RefreshTokenGranter;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.*;
-import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -37,7 +36,7 @@ import org.springframework.web.filter.CorsFilter;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -115,20 +114,20 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 //        return new JwtTokenStore(accessTokenConverter());
     }
 
-    /**
-     * AccessToken转换器-定义token的生成方式，这里使用JWT生成token，对称加密只需要加入key等其他信息（自定义）
-     */
-    @Bean
-    public JwtAccessTokenConverter accessTokenConverter() {
-        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        converter.setSigningKey("123");
-        return converter;
-    }
+//    /**
+//     * AccessToken转换器-定义token的生成方式，这里使用JWT生成token，对称加密只需要加入key等其他信息（自定义）
+//     */
+//    @Bean
+//    public JwtAccessTokenConverter accessTokenConverter() {
+//        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+//        converter.setSigningKey("123");
+//        return converter;
+//    }
 
     @Bean
     public TokenEnhancer tokenEnhancer() {
         TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
-        tokenEnhancerChain.setTokenEnhancers(Arrays.asList(new CustomTokenEnhancer(), accessTokenConverter()));
+        tokenEnhancerChain.setTokenEnhancers(Collections.singletonList(new CustomTokenEnhancer()));
         return tokenEnhancerChain;
     }
 
@@ -200,7 +199,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 //开启密码授权类型
                 .authenticationManager(authenticationManager)
                 // 告诉spring security token的生成方式
-                .accessTokenConverter(accessTokenConverter())
+//                .accessTokenConverter(accessTokenConverter())
                 //接收GET和POST
                 .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
         //自定义登录或者鉴权失败时的返回信息
