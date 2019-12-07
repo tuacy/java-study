@@ -23,10 +23,11 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
      */
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.requestMatchers().antMatchers("/hi")
+        http.requestMatchers()
+                .antMatchers("/redisOauth", "/jwtOauth", "/user")
                 .and()
                 .authorizeRequests()
-                .antMatchers("/hi").authenticated();
+                .antMatchers("/redisOauth", "/jwtOauth", "/user").authenticated();
     }
 
 }
