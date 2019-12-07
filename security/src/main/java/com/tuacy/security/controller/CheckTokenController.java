@@ -14,8 +14,10 @@ import java.security.Principal;
  */
 @RestController
 public class CheckTokenController {
+
     @RequestMapping("/user")
     public Principal user(Principal user) {
         return user;
     }
+
 }

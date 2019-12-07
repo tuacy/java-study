@@ -15,7 +15,7 @@ import java.util.Collection;
  * @author: tuacy.
  * @date: 2019/12/2.
  * @version: 1.0
- * @Description: 决策器
+ * @Description: 决策器 -- 认证管理器
  * <p>
  * MyAccessDecisionManager 类实现了AccessDecisionManager接口，AccessDecisionManager是由AbstractSecurityInterceptor调用的，
  * 它负责鉴定用户是否有访问对应资源（方法或URL）的权限

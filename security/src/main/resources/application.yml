@@ -51,4 +51,4 @@ mybatis:
   mapperLocations: classpath:mapper/*.xml
 
 token-store:
-  type: jdbc # redis、jdbc、jwt、memory
+  type: redis # redis、jdbc、jwt、memory

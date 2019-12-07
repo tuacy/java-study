@@ -21,7 +21,7 @@ import java.util.List;
  * @author: tuacy.
  * @date: 2019/12/2.
  * @version: 1.0
- * @Description:
+ * @Description: 动态配置url权限认证
  */
 @Component
 public class CustomInvocationSecurityMetadataSourceService implements FilterInvocationSecurityMetadataSource {

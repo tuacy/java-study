@@ -16,7 +16,7 @@ import java.io.IOException;
  * @author: tuacy.
  * @date: 2019/12/2.
  * @version: 1.0
- * @Description: 拦截器
+ * @Description: 自定义动态数据拦截器
  * <p>
  * 每种受支持的安全对象类型（方法调用或Web请求）都有自己的拦截器类，它是AbstractSecurityInterceptor的子类，
  * AbstractSecurityInterceptor 是一个实现了对受保护对象的访问进行拦截的抽象类

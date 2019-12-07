@@ -10,7 +10,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
  * @author: tuacy.
  * @date: 2019/11/28.
  * @version: 1.0
- * @Description:
+ * @Description: ResourceServerConfigurerAdapter 用于保护oauth要开放的资源，同时主要作用于client端以及token的认证
  */
 @Configuration
 @EnableResourceServer
@@ -23,11 +23,10 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
      */
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.requestMatchers()
-                .antMatchers("/redisOauth", "/jwtOauth", "/user")
+        http
+                .requestMatchers().antMatchers("/redisOauth", "/jwtOauth", "/user")
                 .and()
-                .authorizeRequests()
-                .antMatchers("/redisOauth", "/jwtOauth", "/user").authenticated();
+                .authorizeRequests().antMatchers("/redisOauth", "/jwtOauth", "/user").authenticated();
     }
 
 }
