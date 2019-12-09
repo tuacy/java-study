@@ -1,5 +1,5 @@
 server:
-  port: 8099
+  port: 8101
 
 info:
   description: 认证服务
@@ -43,14 +43,6 @@ spring:
     ehcache:
       config: classpath:ehcache.xml
 
-#  security:
-#    oauth2:
-#      resource:
-#        id: basic-system
-#        user-info-uri: http://192.168.1.101:8000/auth-service/user
-#        prefer-token-info: false
-
-
 eureka:
   client:
     serviceUrl:
@@ -61,6 +53,26 @@ eureka:
     prefer-ip-address: true
     leaseRenewalIntervalInSeconds: 5
     leaseExpirationDurationInSeconds: 5
+
+feign:
+  hystrix:
+    enabled: true
+
+hystrix:
+  command:
+    default: #default全局有效，service id指定应用有效
+      execution:
+        timeout:
+          enabled: true #如果enabled设置为false，则请求超时交给ribbon控制,为true,则超时作为熔断根据
+        isolation:
+          thread:
+            timeoutInMilliseconds: 126000 #断路器超时时间，默认1000ms
+ribbon:
+  MaxAutoRetries: 1 #最大重试次数，当Eureka中可以找到服务，但是服务连不上时将会重试
+  MaxAutoRetriesNextServer: 1 #切换实例的重试次数
+  OkToRetryOnAllOperations: true # 对所有的操作请求都进行重试，如果是get则可以，如果是post,put等操作没有实现幂等的情况下是很危险的
+  ConnectTimeout: 250 #请求连接的超时时间
+  ReadTimeout: 1000 #请求处理的超时时间
 
 mybatis:
   typeAliasesPackage: com.tuacy.security.entity.model

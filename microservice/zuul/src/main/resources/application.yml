@@ -19,23 +19,10 @@ eureka:
 zuul:
   retryable: true
   routes:
-    dcim-energy-provider: /energy-service/**
-    dcim-workflow-provider: /workflow-service/**
-    dcim-alarm-provider: /alarm-service/**
-    websocket-provider: /websocket-service/**
-    dcim-asset-provider: /asset-service/**
-    dcim-monitor-provider: /monitor-service/**
-    dcim-capacity-provider: /capacity-service/**
-    dcim-operatelog-provider: /operatelog-service/**
-    dcim-systemmanage-provider: /userinfo-service/**
-    dcim-data-query-provider: /data-query-service/**
-    dcim-sms-provider: /sms-service/**
-    dcim-quartz-provider: /quartz-service/**
-    dcim-auth-server:
-      path: /auth-service/**
-      strip-prefix: true
-      sensitiveHeaders:
-      serviceId: dcim-auth-server
+    security:
+      path: /security-service/**
+    user-manager:
+      path: /user-manager-service/**
   host:
     socket-timeout-millis: 60000
     connect-timeout-millis: 60000

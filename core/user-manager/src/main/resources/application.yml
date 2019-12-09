@@ -1,22 +1,12 @@
 server:
-  port: 8101
+  port: 8102
 
 info:
-  description: 认证服务
+  description: 用户管理
 
 spring:
   application:
-    name: security
-  thymeleaf:
-    #模板的模式，支持 HTML, XML TEXT JAVASCRIPT
-    mode: HTML5
-    #编码 可不用配置
-    encoding: UTF-8
-    #开发配置为false,避免修改模板还要重启服务器
-    cache: false
-    #配置模板路径，默认是templates，可以不用配置
-    #    prefix: classpath:/templates
-    suffix: .html
+    name: user-manager
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/tuacydev?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=UTC
     username: root
@@ -38,10 +28,11 @@ spring:
         max-idle: 200
         #最小空闲
         min-idle: 10
-  cache:
-    type: ehcache
-    ehcache:
-      config: classpath:ehcache.xml
+
+security:
+  oauth2:
+    resource:
+      user-info-uri: http://127.0.0.1:8000/security-service/auth/user
 
 eureka:
   client:
@@ -75,8 +66,8 @@ ribbon:
   ReadTimeout: 1000 #请求处理的超时时间
 
 mybatis:
-  typeAliasesPackage: com.tuacy.security.entity.model
+  typeAliasesPackage: com.tuacy.usermanager.entity.model
   mapperLocations: classpath:mapper/*.xml
 
-token-store:
-  type: redis # redis、jdbc、jwt、memory
+# 配置认证服务器对应的地址
+auth-service-url: http://127.0.0.1:8000/security-service

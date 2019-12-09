@@ -10,9 +10,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>core</artifactId>
+    <packaging>pom</packaging>
 
     <modules>
         <module>security</module>
+        <module>user-manager</module>
     </modules>
 
     <dependencyManagement>
@@ -57,6 +59,12 @@
         <dependency>
             <groupId>org.springframework.retry</groupId>
             <artifactId>spring-retry</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
         </dependency>
 
     </dependencies>

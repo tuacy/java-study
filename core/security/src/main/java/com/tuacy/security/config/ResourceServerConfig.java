@@ -24,9 +24,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
-                .requestMatchers().antMatchers("/redisOauth", "/jwtOauth", "/user")
+                .requestMatchers().antMatchers("/redisOauth", "/jwtOauth", "/auth/**")
                 .and()
-                .authorizeRequests().antMatchers("/redisOauth", "/jwtOauth", "/user").authenticated();
+                .authorizeRequests().antMatchers("/redisOauth", "/jwtOauth", "/auth/**").authenticated();
     }
 
 }
