@@ -66,3 +66,18 @@ security/target
 # excel
 excel/excel.iml
 excel/target
+
+# microservice
+microservice/microservice.iml
+microservice/target
+
+
+microservice/eureka/eureka.iml
+microservice/eureka/target
+
+microservice/zuul/zuul.iml
+microservice/zuul/target
+
+# business
+business/business.iml
+business/target

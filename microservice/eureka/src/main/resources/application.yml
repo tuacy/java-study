@@ -1,0 +1,30 @@
+server:
+  port: 8761
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+spring:
+  application:
+    name: eureka-server
+eureka:
+  instance:
+    hostname: eureka-server01
+    appname: eureka01
+    prefer-ip-address: true
+    health-check-url-path: /actuator/health
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+  server:
+    waitTimeInMsWhenSyncEmpty: 0
+    enable-self-preservation: false
+    peer-node-read-timeout-ms: 10000
+  client:
+    register-with-eureka: false #表示是否将自己注册在EurekaServer上，默认为true。由于当前应用就是EurekaServer，所以置为false
+    fetch-registry: false #表示是否从EurekaServer获取注册信息，默认为true。单节点不需要同步其他的EurekaServer节点的数据,所以置为false
+    service-url:
+      #注册中心地址，逗号隔开配置多个注册中心
+      defaultZone: http://localhost:8761/eureka/ #设置Eureka的地址
