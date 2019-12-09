@@ -1,5 +1,9 @@
 server:
   port: 8099
+
+info:
+  description: 网关
+
 spring:
   application:
     name: security

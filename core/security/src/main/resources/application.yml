@@ -2,7 +2,7 @@ server:
   port: 8099
 
 info:
-  description: 网关
+  description: 认证服务
 
 spring:
   application:
