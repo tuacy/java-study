@@ -81,3 +81,9 @@ microservice/zuul/target
 # business
 business/business.iml
 business/target
+
+# core
+core/core.iml
+
+core/security/security.iml
+core/security/target

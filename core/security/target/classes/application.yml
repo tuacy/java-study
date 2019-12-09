@@ -34,17 +34,29 @@ spring:
         max-idle: 200
         #最小空闲
         min-idle: 10
-#  cache:
-#    type: ehcache
-#    ehcache:
-#      config: classpath:ehcache.xml
+  cache:
+    type: ehcache
+    ehcache:
+      config: classpath:ehcache.xml
 
-  security:
-    oauth2:
-      resource:
-        id: basic-system
-        user-info-uri: http://192.168.1.101:8000/auth-service/user
-        prefer-token-info: false
+#  security:
+#    oauth2:
+#      resource:
+#        id: basic-system
+#        user-info-uri: http://192.168.1.101:8000/auth-service/user
+#        prefer-token-info: false
+
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    prefer-ip-address: true
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
 
 mybatis:
   typeAliasesPackage: com.tuacy.security.entity.model

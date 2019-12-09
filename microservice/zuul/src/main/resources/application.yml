@@ -1,20 +1,21 @@
 server:
   port: 8000
+
 spring:
   application:
     name: zuul-server
+
+info:
+  description: 网关
 
 eureka:
   client:
     serviceUrl:
       defaultZone:  http://localhost:8761/eureka/
   instance:
-    #向注册中心注册IP
-    prefer-ip-address: true
-    #appname:
+    prefer-ip-address: true #向注册中心注册IP
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-info:
-  description: 网关
+
 zuul:
   retryable: true
   routes:

@@ -1,0 +1,70 @@
+server:
+  port: 8099
+
+info:
+  description: 网关
+
+spring:
+  application:
+    name: security
+  thymeleaf:
+    #模板的模式，支持 HTML, XML TEXT JAVASCRIPT
+    mode: HTML5
+    #编码 可不用配置
+    encoding: UTF-8
+    #开发配置为false,避免修改模板还要重启服务器
+    cache: false
+    #配置模板路径，默认是templates，可以不用配置
+    #    prefix: classpath:/templates
+    suffix: .html
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/tuacydev?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=UTC
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 使用druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+  redis:
+    # 单机模式
+    host: 127.0.0.1 #哨兵模式下不用配置
+    port: 6379 # 哨兵模式下不用配置
+    jedis:
+      pool:
+        #最大连接数
+        max-active: 1024
+        #最大阻塞等待时间(负数表示没限制)
+        max-wait: 20000
+        #最大空闲
+        max-idle: 200
+        #最小空闲
+        min-idle: 10
+  cache:
+    type: ehcache
+    ehcache:
+      config: classpath:ehcache.xml
+
+#  security:
+#    oauth2:
+#      resource:
+#        id: basic-system
+#        user-info-uri: http://192.168.1.101:8000/auth-service/user
+#        prefer-token-info: false
+
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    prefer-ip-address: true
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
+
+mybatis:
+  typeAliasesPackage: com.tuacy.security.entity.model
+  mapperLocations: classpath:mapper/*.xml
+
+token-store:
+  type: redis # redis、jdbc、jwt、memory
