@@ -57,11 +57,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable(); // 不启用CSRF保护
-        http
-                .requestMatchers().antMatchers("/oauth/**")
+//        http
+//                .csrf().disable()
+//                .authorizeRequests()
+//                .antMatchers( "/oauth/**", "/actuator/**").permitAll()
+//                .anyRequest().authenticated()
+//                .and()
+//                .httpBasic();
+        http.csrf().disable();
+        http.requestMatchers()
+                .antMatchers("/oauth/**","/login","/login-error")
                 .and()
-                .authorizeRequests().antMatchers("/oauth/**").authenticated();
+                .authorizeRequests()
+                .antMatchers("/oauth/**").authenticated()
+                .and()
+                .formLogin().loginPage( "/login" ).failureUrl( "/login-error" );
     }
 
 

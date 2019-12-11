@@ -1,6 +1,7 @@
 package com.tuacy.usermanager.service;
 
 import com.tuacy.usermanager.entity.AuthorizationResult;
+import com.tuacy.usermanager.entity.param.ClientAuthorizationParam;
 import com.tuacy.usermanager.entity.param.PasswordAuthorizationParam;
 import com.tuacy.usermanager.exception.BusinessException;
 
@@ -16,12 +17,12 @@ public interface Authorization {
     /**
      * 授权码模式(authorization code)
      */
-    void authorizationCode() throws  BusinessException;
+    void authorizationCode() throws BusinessException;
 
     /**
      * 简化模式(implicit)
      */
-    void implicit() throws  BusinessException;
+    void implicit() throws BusinessException;
 
     /**
      * 密码模式(recource ovner password credentials)
@@ -31,6 +32,6 @@ public interface Authorization {
     /**
      * 客户端模式(client credentials)
      */
-    void clientCredentials() throws  BusinessException;
+    AuthorizationResult clientCredentials(ClientAuthorizationParam param) throws BusinessException;
 
 }

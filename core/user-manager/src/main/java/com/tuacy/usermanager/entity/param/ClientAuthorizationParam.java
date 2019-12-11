@@ -7,13 +7,11 @@ import lombok.Data;
  * @author: tuacy.
  * @date: 2019/12/9.
  * @version: 1.0
- * @Description: 密码授权模式
+ * @Description: 客户端授权模式
  */
 @Data
-public class PasswordAuthorizationParam {
+public class ClientAuthorizationParam {
 
-    private String username;
-    private String password;
     private String grant_type;
     private String client_id;
     private String client_secret;

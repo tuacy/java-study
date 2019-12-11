@@ -16,9 +16,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
         http.
                 csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/user/authorization/**").permitAll()
-                .anyRequest().authenticated()
+                .authorizeRequests() // 对请求做授权配置
+                .antMatchers("/user/authorization/**").permitAll() //允许所有人访问 /user/authorization/**"
+                .anyRequest().authenticated() // 任何请求。需要身份认证
                 .and()
                 .httpBasic();
     }

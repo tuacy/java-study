@@ -1,6 +1,7 @@
 package com.tuacy.usermanager.controller;
 
 import com.tuacy.usermanager.entity.AuthorizationResult;
+import com.tuacy.usermanager.entity.param.ClientAuthorizationParam;
 import com.tuacy.usermanager.entity.param.PasswordAuthorizationParam;
 import com.tuacy.usermanager.exception.BusinessException;
 import com.tuacy.usermanager.service.impl.AuthorizationImpl;
@@ -53,7 +54,8 @@ public class AuthorizationController {
     /**
      * 客户端模式(client credentials)
      */
-    public void clientCredentials() {
-
+    @RequestMapping(value = "/client", method = RequestMethod.POST)
+    public AuthorizationResult clientCredentials(@RequestBody ClientAuthorizationParam param) throws BusinessException {
+        return authorization.clientCredentials(param);
     }
 }
