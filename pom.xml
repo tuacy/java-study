@@ -41,9 +41,6 @@
         <module>email</module>
         <module>redis</module>
         <module>excel</module>
-        <module>microservice</module>
-        <module>business</module>
-        <module>core</module>
     </modules>
 
     <!-- 公共的依赖，每个module对应依赖这些 -->
