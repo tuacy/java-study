@@ -85,8 +85,8 @@ business/target
 # core
 core/core.iml
 
-core/security/security.iml
-core/security/target
+core/security-oauth/security-oauth.iml
+core/security-oauth/target
 
 core/user-manager/user-manager.iml
 core/user-manager/target

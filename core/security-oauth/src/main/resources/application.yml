@@ -1,12 +1,22 @@
 server:
-  port: 8102
+  port: 8101
 
 info:
-  description: 用户管理
+  description: 认证服务
 
 spring:
   application:
-    name: user-manager
+    name: security-oauth
+  thymeleaf:
+    #模板的模式，支持 HTML, XML TEXT JAVASCRIPT
+    mode: HTML5
+    #编码 可不用配置
+    encoding: UTF-8
+    #开发配置为false,避免修改模板还要重启服务器
+    cache: false
+    #配置模板路径，默认是templates，可以不用配置
+    #    prefix: classpath:/templates
+    suffix: .html
   datasource:
     name: mysql_test
     type: com.alibaba.druid.pool.DruidDataSource
@@ -42,11 +52,10 @@ spring:
         max-idle: 200
         #最小空闲
         min-idle: 10
-
-security:
-  oauth2:
-    resource:
-      user-info-uri: http://127.0.0.1:8000/security-service/auth/user
+  cache:
+    type: ehcache
+    ehcache:
+      config: classpath:ehcache.xml
 
 eureka:
   client:
@@ -80,8 +89,8 @@ ribbon:
   ReadTimeout: 1000 #请求处理的超时时间
 
 mybatis:
-  typeAliasesPackage: com.tuacy.usermanager.entity.model
+  typeAliasesPackage: com.tuacy.securityoauth.entity.model
   mapperLocations: classpath:mapper/*.xml
 
-# 配置认证服务器对应的地址
-auth-service-url: http://127.0.0.1:8000/security-service
+token-store:
+  type: redis # redis、jdbc、jwt、memory

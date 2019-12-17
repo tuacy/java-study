@@ -19,7 +19,7 @@ eureka:
 zuul:
   retryable: true
   routes:
-    security:
+    security-oauth:
       path: /security-service/**
     user-manager:
       path: /user-manager-service/**

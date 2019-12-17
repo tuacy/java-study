@@ -13,8 +13,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>security</module>
         <module>user-manager</module>
+        <module>security-oauth</module>
     </modules>
 
     <dependencyManagement>
