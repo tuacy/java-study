@@ -41,6 +41,7 @@
         <module>email</module>
         <module>redis</module>
         <module>excel</module>
+        <module>jexl</module>
     </modules>
 
     <!-- 公共的依赖，每个module对应依赖这些 -->

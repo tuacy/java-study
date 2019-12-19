@@ -67,26 +67,6 @@ security/target
 excel/excel.iml
 excel/target
 
-# microservice
-microservice/microservice.iml
-microservice/target
-
-
-microservice/eureka/eureka.iml
-microservice/eureka/target
-
-microservice/zuul/zuul.iml
-microservice/zuul/target
-
-# business
-business/business.iml
-business/target
-
-# core
-core/core.iml
-
-core/security-oauth/security-oauth.iml
-core/security-oauth/target
-
-core/user-manager/user-manager.iml
-core/user-manager/target
+# jexl
+jexl/jexl.iml
+jexl/target
