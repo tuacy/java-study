@@ -30,7 +30,7 @@ public class JexlTest {
             map.put("money", 2100);
             String expression = "money>=2000&&money<=4000";
             Object code = convertToCode(expression, map);
-            if ((boolean)code) {
+            if ((boolean) code) {
                 System.out.println("true");
             } else {
                 System.out.println("false");
@@ -50,9 +50,6 @@ public class JexlTest {
         JexlContext jexlContext = new MapContext();
         for (String key : map.keySet()) {
             jexlContext.set(key, map.get(key));
-        }
-        if (null == expression.evaluate(jexlContext)) {
-            return "";
         }
         return expression.evaluate(jexlContext);
     }
